@@ -1,0 +1,106 @@
+---
+/**
+ * Toggle de áudio ambiente. 
+ * Conecta-se ao GlobalAudio persistente.
+ */
+---
+
+<button class="audio-toggle" id="audio-btn" aria-label="Ligar música ambiente" aria-pressed="false">
+  <svg class="icon icon-muted" width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path d="M9 18V5l12-2v13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="6" cy="18" r="3" stroke="currentColor" stroke-width="1.5"/>
+    <circle cx="18" cy="16" r="3" stroke="currentColor" stroke-width="1.5"/>
+    <line x1="3" y1="3" x2="21" y2="21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+  </svg>
+  <svg class="icon icon-playing" width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path d="M9 18V5l12-2v13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="6" cy="18" r="3" stroke="currentColor" stroke-width="1.5"/>
+    <circle cx="18" cy="16" r="3" stroke="currentColor" stroke-width="1.5"/>
+  </svg>
+</button>
+
+<style>
+  .audio-toggle {
+    background: transparent;
+    border: none;
+    color: var(--color-ivory-subtle);
+    cursor: pointer;
+    padding: var(--space-2);
+    border-radius: var(--radius-full);
+    transition: color var(--transition-fast), transform var(--transition-fast);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .audio-toggle:hover {
+    color: var(--color-starlight-gold);
+    transform: scale(1.1);
+  }
+
+  .audio-toggle[aria-pressed="true"] {
+    color: var(--color-starlight-gold);
+    animation: slow-pulse 4s infinite alternate;
+  }
+
+  .icon-playing {
+    display: none;
+  }
+
+  .audio-toggle[aria-pressed="true"] .icon-muted {
+    display: none;
+  }
+
+  .audio-toggle[aria-pressed="true"] .icon-playing {
+    display: block;
+  }
+
+  @keyframes slow-pulse {
+    0% { opacity: 0.7; }
+    100% { opacity: 1; filter: drop-shadow(0 0 8px rgba(212, 176, 106, 0.4)); }
+  }
+</style>
+
+<script>
+  // Usa astro:page-load para funcionar perfeitamente com View Transitions
+  document.addEventListener('astro:page-load', () => {
+    const audioEl = document.getElementById('global-ambient-audio') as HTMLAudioElement;
+    const audioBtn = document.getElementById('audio-btn');
+    
+    if (!audioEl || !audioBtn) return;
+    
+    // Atualiza a UI baseada no estado atual do áudio global
+    const updateUI = () => {
+      const isPlaying = !audioEl.paused;
+      audioBtn.setAttribute('aria-pressed', isPlaying.toString());
+      audioBtn.setAttribute('aria-label', isPlaying ? 'Desligar música ambiente' : 'Ligar música ambiente');
+    };
+
+    // Sincroniza estado inicial
+    updateUI();
+
+    // Listener para o botão
+    audioBtn.addEventListener('click', () => {
+      if (!audioEl.paused) {
+        audioEl.pause();
+        localStorage.setItem('rnm_audio_playing', 'false');
+      } else {
+        const playPromise = audioEl.play();
+        if (playPromise !== undefined) {
+          playPromise.then(() => {
+            localStorage.setItem('rnm_audio_playing', 'true');
+          }).catch(err => {
+            console.error("Falha ao tocar áudio:", err);
+            localStorage.setItem('rnm_audio_playing', 'false');
+          });
+        }
+      }
+      // UI atualiza pelo evento abaixo, mas podemos forçar para responsividade imediata
+      setTimeout(updateUI, 50);
+    });
+
+    // Escuta eventos do próprio elemento para caso pause por outros motivos
+    audioEl.addEventListener('play', updateUI);
+    audioEl.addEventListener('pause', updateUI);
+  });
+</script>

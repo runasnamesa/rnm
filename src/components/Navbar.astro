@@ -1,0 +1,322 @@
+---
+/**
+ * Navbar — A prateleira de madeira no topo da taverna.
+ *
+ * Sticky, translúcida, com glassmorphism suave. O gradiente dourado
+ * na borda inferior simula a luz de velas refletindo na madeira.
+ *
+ * Reutilização: presente em todas as páginas via BaseLayout.
+ */
+
+interface NavLink {
+  label: string;
+  href: string;
+}
+
+const navLinks: NavLink[] = [
+  { label: 'Início', href: '/' },
+  { label: 'Guias', href: '/guias' },
+  { label: 'Lore', href: '/lore' },
+  { label: 'Taverna', href: '/taverna' },
+  { label: 'Sobre', href: '/sobre' },
+];
+
+import AudioToggle from './AudioToggle.astro';
+
+const currentPath = Astro.url.pathname;
+---
+
+<header class="navbar" id="navbar">
+  <div class="navbar__inner container">
+    <!-- Logo -->
+    <a href="/" class="navbar__logo" aria-label="Runas na Mesa — Página inicial">
+      <!-- Ícone de runa estilizada -->
+      <svg class="navbar__logo-icon" width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+        <path d="M14 2L2 14l12 12 12-12L14 2z" stroke="currentColor" stroke-width="1.5" fill="none" opacity="0.6"/>
+        <path d="M14 7l-7 7 7 7 7-7-7-7z" stroke="currentColor" stroke-width="1" fill="none" opacity="0.3"/>
+        <circle cx="14" cy="14" r="2" fill="currentColor" opacity="0.8"/>
+      </svg>
+      <span class="navbar__logo-text">Runas na Mesa</span>
+    </a>
+
+    <div class="navbar__right">
+      <!-- Navegação Desktop -->
+      <nav class="navbar__nav" aria-label="Navegação principal">
+        <ul class="navbar__links" role="list">
+          {navLinks.map((link) => (
+            <li>
+              <a
+                href={link.href}
+                class:list={['navbar__link', { 'navbar__link--active': currentPath === link.href }]}
+                aria-current={currentPath === link.href ? 'page' : undefined}
+              >
+                {link.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+
+      <div class="navbar__actions">
+        <AudioToggle />
+      </div>
+
+      <!-- Botão Mobile (hambúrguer) -->
+      <button
+        class="navbar__toggle"
+        aria-label="Abrir menu de navegação"
+        aria-expanded="false"
+        aria-controls="mobile-menu"
+        id="navbar-toggle"
+      >
+        <span class="navbar__toggle-bar"></span>
+        <span class="navbar__toggle-bar"></span>
+        <span class="navbar__toggle-bar"></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Menu Mobile -->
+  <nav
+    class="navbar__mobile-menu"
+    id="mobile-menu"
+    aria-label="Menu de navegação mobile"
+    hidden
+  >
+    <ul class="navbar__mobile-links" role="list">
+      {navLinks.map((link) => (
+        <li>
+          <a
+            href={link.href}
+            class:list={['navbar__mobile-link', { 'navbar__mobile-link--active': currentPath === link.href }]}
+            aria-current={currentPath === link.href ? 'page' : undefined}
+          >
+            {link.label}
+          </a>
+        </li>
+      ))}
+    </ul>
+  </nav>
+</header>
+
+<style>
+  .navbar {
+    position: sticky;
+    top: 0;
+    z-index: var(--z-sticky);
+    background: var(--surface-glass);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border-subtle);
+    transition: background var(--transition-base),
+                box-shadow var(--transition-base);
+  }
+
+  .navbar::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      var(--color-starlight-gold) 30%,
+      var(--color-soft-gold) 50%,
+      var(--color-starlight-gold) 70%,
+      transparent 100%
+    );
+    opacity: 0.3;
+  }
+
+  .navbar__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 4.5rem;
+  }
+
+  /* Logo */
+  .navbar__logo {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    transition: opacity var(--transition-fast);
+  }
+
+  .navbar__logo:hover {
+    opacity: 0.85;
+  }
+
+  .navbar__logo-icon {
+    color: var(--color-starlight-gold);
+    flex-shrink: 0;
+  }
+
+  .navbar__logo-text {
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    font-weight: var(--weight-semibold);
+    color: var(--color-ivory);
+    letter-spacing: 0.05em;
+  }
+
+  .navbar__right {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+  }
+
+  /* Navegação Desktop */
+  .navbar__nav {
+    display: none;
+  }
+
+  .navbar__actions {
+    display: flex;
+    align-items: center;
+  }
+
+  .navbar__links {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+  }
+
+  .navbar__link {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    padding: var(--space-2) var(--space-4);
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    color: var(--color-ivory-muted);
+    letter-spacing: 0.03em;
+    border-radius: var(--radius-md);
+    transition: color var(--transition-fast),
+                background var(--transition-fast);
+  }
+
+  .navbar__link:hover {
+    color: var(--color-ivory);
+    background: var(--color-ivory-ghost);
+  }
+
+  .navbar__link--active {
+    color: var(--color-starlight-gold);
+  }
+
+  .navbar__link--active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 16px;
+    height: 2px;
+    background: var(--color-starlight-gold);
+    border-radius: var(--radius-full);
+    box-shadow: 0 0 8px rgba(212, 176, 106, 0.4);
+  }
+
+  /* Botão Mobile */
+  .navbar__toggle {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    width: 2.5rem;
+    height: 2.5rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    border-radius: var(--radius-md);
+    transition: background var(--transition-fast);
+  }
+
+  .navbar__toggle:hover {
+    background: var(--color-ivory-ghost);
+  }
+
+  .navbar__toggle-bar {
+    display: block;
+    width: 20px;
+    height: 2px;
+    background: var(--color-ivory-muted);
+    border-radius: var(--radius-full);
+    transition: transform var(--transition-base),
+                opacity var(--transition-base);
+  }
+
+  /* Menu Mobile */
+  .navbar__mobile-menu {
+    border-top: 1px solid var(--border-subtle);
+    background: var(--surface-tavern);
+    padding: var(--space-4) 0;
+  }
+
+  .navbar__mobile-menu[hidden] {
+    display: none;
+  }
+
+  .navbar__mobile-links {
+    display: flex;
+    flex-direction: column;
+    padding: 0 var(--space-6);
+    gap: var(--space-1);
+  }
+
+  .navbar__mobile-link {
+    display: block;
+    padding: var(--space-3) var(--space-4);
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    font-weight: var(--weight-medium);
+    color: var(--color-ivory-muted);
+    border-radius: var(--radius-md);
+    transition: color var(--transition-fast),
+                background var(--transition-fast);
+  }
+
+  .navbar__mobile-link:hover {
+    color: var(--color-ivory);
+    background: var(--color-ivory-ghost);
+  }
+
+  .navbar__mobile-link--active {
+    color: var(--color-starlight-gold);
+    background: rgba(212, 176, 106, 0.06);
+  }
+
+  /* Desktop Breakpoint */
+  @media (min-width: 768px) {
+    .navbar__nav {
+      display: block;
+    }
+
+    .navbar__toggle {
+      display: none;
+    }
+
+    .navbar__mobile-menu {
+      display: none !important;
+    }
+  }
+</style>
+
+<script>
+  // Toggle menu mobile
+  const toggle = document.getElementById('navbar-toggle');
+  const menu = document.getElementById('mobile-menu');
+
+  if (toggle && menu) {
+    toggle.addEventListener('click', () => {
+      const isExpanded = toggle.getAttribute('aria-expanded') === 'true';
+      toggle.setAttribute('aria-expanded', String(!isExpanded));
+      menu.hidden = isExpanded;
+    });
+  }
+</script>

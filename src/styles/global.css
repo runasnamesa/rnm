@@ -1,0 +1,314 @@
+/* ═══════════════════════════════════════════════════════════════
+   Runas na Mesa — Design System
+   "Uma taverna quente após uma longa travessia pela montanha."
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ─── Reset ─────────────────────────────────────────────────── */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  min-height: 100vh;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+input,
+button,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+ul,
+ol {
+  list-style: none;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  overflow-wrap: break-word;
+  line-height: 1.2;
+}
+
+p {
+  overflow-wrap: break-word;
+}
+
+/* ─── Design Tokens ─────────────────────────────────────────── */
+
+:root {
+  /* Paleta Base — O exterior frio da montanha */
+  --color-deep-space: #0A1026;
+  --color-midnight-blue: #142B52;
+  --color-constellation: #254A7A;
+
+  /* Iluminação — O calor das velas da taverna */
+  --color-starlight-gold: #D4B06A;
+  --color-soft-gold: #F0D79A;
+
+  /* Texto — Páginas gastas de livros antigos */
+  --color-ivory: #F8F6EE;
+  --color-ivory-muted: rgba(248, 246, 238, 0.75);
+  --color-ivory-subtle: rgba(248, 246, 238, 0.45);
+  --color-ivory-ghost: rgba(248, 246, 238, 0.15);
+
+  /* Superfícies — Madeira envelhecida da taverna */
+  --surface-tavern: #0D1529;
+  --surface-card: #111D38;
+  --surface-elevated: #162444;
+  --surface-glass: rgba(13, 21, 41, 0.75);
+
+  /* Bordas */
+  --border-subtle: rgba(212, 176, 106, 0.12);
+  --border-default: rgba(212, 176, 106, 0.2);
+  --border-strong: rgba(212, 176, 106, 0.35);
+
+  /* Espaçamento — Escala 4px, generosa como o espaço de uma taverna */
+  --space-1: 0.25rem;   /* 4px */
+  --space-2: 0.5rem;    /* 8px */
+  --space-3: 0.75rem;   /* 12px */
+  --space-4: 1rem;      /* 16px */
+  --space-5: 1.25rem;   /* 20px */
+  --space-6: 1.5rem;    /* 24px */
+  --space-8: 2rem;      /* 32px */
+  --space-10: 2.5rem;   /* 40px */
+  --space-12: 3rem;     /* 48px */
+  --space-16: 4rem;     /* 64px */
+  --space-20: 5rem;     /* 80px */
+  --space-24: 6rem;     /* 96px */
+  --space-32: 8rem;     /* 128px */
+
+  /* Tipografia — Famílias */
+  --font-display: 'Cinzel', serif;
+  --font-heading: 'Playfair Display', serif;
+  --font-body: 'Montserrat', sans-serif;
+  --font-alt: 'Poppins', sans-serif;
+
+  /* Tipografia — Escala fluida */
+  --text-xs: clamp(0.7rem, 0.65rem + 0.25vw, 0.8rem);
+  --text-sm: clamp(0.8rem, 0.75rem + 0.25vw, 0.9rem);
+  --text-base: clamp(0.95rem, 0.9rem + 0.25vw, 1.05rem);
+  --text-lg: clamp(1.05rem, 1rem + 0.3vw, 1.2rem);
+  --text-xl: clamp(1.2rem, 1.1rem + 0.5vw, 1.45rem);
+  --text-2xl: clamp(1.4rem, 1.25rem + 0.75vw, 1.85rem);
+  --text-3xl: clamp(1.75rem, 1.5rem + 1.25vw, 2.5rem);
+  --text-4xl: clamp(2rem, 1.7rem + 1.5vw, 3.2rem);
+  --text-5xl: clamp(2.5rem, 2rem + 2.5vw, 4.5rem);
+  --text-6xl: clamp(3rem, 2.5rem + 3vw, 5.5rem);
+
+  /* Pesos */
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+
+  /* Bordas arredondadas — Como cantos desgastados de madeira */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 24px;
+  --radius-full: 9999px;
+
+  /* Sombras — Quentes, como a luz tremulante das velas */
+  --shadow-sm: 0 1px 3px rgba(10, 16, 38, 0.4),
+               0 1px 2px rgba(10, 16, 38, 0.3);
+  --shadow-md: 0 4px 12px rgba(10, 16, 38, 0.5),
+               0 2px 4px rgba(10, 16, 38, 0.3);
+  --shadow-lg: 0 12px 40px rgba(10, 16, 38, 0.6),
+               0 4px 12px rgba(10, 16, 38, 0.3);
+  --shadow-glow: 0 0 20px rgba(212, 176, 106, 0.15),
+                 0 0 60px rgba(212, 176, 106, 0.05);
+  --shadow-glow-strong: 0 0 30px rgba(212, 176, 106, 0.25),
+                        0 0 80px rgba(212, 176, 106, 0.1);
+
+  /* Transições — Suaves como o crepitar de uma lareira */
+  --transition-fast: 200ms ease;
+  --transition-base: 300ms ease;
+  --transition-slow: 500ms ease;
+  --transition-spring: 350ms cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* Z-index */
+  --z-base: 1;
+  --z-dropdown: 10;
+  --z-sticky: 100;
+  --z-overlay: 1000;
+  --z-modal: 2000;
+
+  /* Larguras */
+  --width-content: 72rem;    /* 1152px — leitura confortável */
+  --width-narrow: 48rem;     /* 768px — artigos */
+  --width-wide: 90rem;       /* 1440px — layouts amplos */
+}
+
+/* ─── Estilos Base ──────────────────────────────────────────── */
+
+body {
+  background-color: var(--color-deep-space);
+  color: var(--color-ivory);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  font-weight: var(--weight-regular);
+}
+
+::selection {
+  background-color: var(--color-starlight-gold);
+  color: var(--color-deep-space);
+}
+
+/* Scrollbar personalizada — discreta */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-deep-space);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-midnight-blue);
+  border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-constellation);
+}
+
+/* Focus visível acessível */
+:focus-visible {
+  outline: 2px solid var(--color-starlight-gold);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
+}
+
+/* ─── Utilitários ───────────────────────────────────────────── */
+
+.container {
+  width: 100%;
+  max-width: var(--width-content);
+  margin-inline: auto;
+  padding-inline: var(--space-6);
+}
+
+.container--narrow {
+  max-width: var(--width-narrow);
+}
+
+.container--wide {
+  max-width: var(--width-wide);
+}
+
+/* Acessibilidade: visually hidden */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Brilho dourado em texto */
+.glow-text {
+  text-shadow: 0 0 30px rgba(212, 176, 106, 0.3),
+               0 0 60px rgba(212, 176, 106, 0.1);
+}
+
+/* Gradiente dourado na borda inferior */
+.border-glow {
+  border-image: linear-gradient(
+    90deg,
+    transparent,
+    var(--color-starlight-gold),
+    transparent
+  ) 1;
+}
+
+/* ─── Keyframes ─────────────────────────────────────────────── */
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes shimmer {
+  0% { opacity: 0.3; }
+  50% { opacity: 0.8; }
+  100% { opacity: 0.3; }
+}
+
+@keyframes glow-pulse {
+  0%, 100% {
+    text-shadow: 0 0 20px rgba(212, 176, 106, 0.2),
+                 0 0 40px rgba(212, 176, 106, 0.05);
+  }
+  50% {
+    text-shadow: 0 0 30px rgba(212, 176, 106, 0.35),
+                 0 0 60px rgba(212, 176, 106, 0.1);
+  }
+}
+
+/* ─── Preferências de acessibilidade ────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

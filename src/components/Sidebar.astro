@@ -1,0 +1,124 @@
+---
+/**
+ * Sidebar Discreta.
+ * Apresentação rápida do autor e links mínimos.
+ */
+---
+
+<aside class="sidebar" aria-label="Sobre o Taverneiro">
+  <div class="sidebar__author">
+    <div class="sidebar__avatar" aria-hidden="true">
+      <!-- Placeholder para foto/ilustração do Mob -->
+      <svg
+        width="40"
+        height="40"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.5"
+      >
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+        <circle cx="12" cy="7" r="4"></circle>
+      </svg>
+    </div>
+
+    <div class="sidebar__bio">
+      <h3 class="sidebar__name">Magnus Silvershield</h3>
+      <p class="sidebar__role">Taverneiro e Guardião dos Tomos.</p>
+    </div>
+  </div>
+
+  <p class="sidebar__quote">
+    "Uma caneca quente e uma boa história.<br />
+    É tudo que um aventureiro precisa."
+  </p>
+
+  <nav class="sidebar__links" aria-label="Links Sociais">
+    <a href="#" class="sidebar__link" target="_blank" rel="noopener noreferrer"
+      >Substack</a
+    >
+    <a href="#" class="sidebar__link" target="_blank" rel="noopener noreferrer"
+      >Instagram</a
+    >
+    <a href="#" class="sidebar__link" target="_blank" rel="noopener noreferrer"
+      >GitHub</a
+    >
+  </nav>
+</aside>
+
+<style>
+  .sidebar {
+    padding: var(--space-6);
+    border-radius: var(--radius-lg);
+    background-color: var(--surface-card);
+    border: 1px solid var(--border-subtle);
+    height: fit-content;
+    position: sticky;
+    top: var(--space-24); /* Fica fixo ao rolar a página */
+  }
+
+  .sidebar__author {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    margin-bottom: var(--space-4);
+  }
+
+  .sidebar__avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-full);
+    background-color: var(--color-deep-space);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-starlight-gold);
+    border: 1px solid var(--border-default);
+    flex-shrink: 0;
+  }
+
+  .sidebar__name {
+    font-family: var(--font-heading);
+    font-size: var(--text-base);
+    color: var(--color-ivory);
+    font-weight: var(--weight-semibold);
+  }
+
+  .sidebar__role {
+    font-family: var(--font-body);
+    font-size: var(--text-xs);
+    color: var(--color-ivory-subtle);
+    margin-top: 2px;
+  }
+
+  .sidebar__quote {
+    font-family: var(--font-body);
+    font-style: italic;
+    font-size: var(--text-sm);
+    color: var(--color-ivory-muted);
+    line-height: 1.6;
+    margin-bottom: var(--space-6);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .sidebar__links {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .sidebar__link {
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    color: var(--color-ivory-subtle);
+    transition:
+      color var(--transition-fast),
+      text-shadow var(--transition-fast);
+  }
+
+  .sidebar__link:hover {
+    color: var(--color-starlight-gold);
+    text-shadow: 0 0 8px rgba(212, 176, 106, 0.3);
+  }
+</style>

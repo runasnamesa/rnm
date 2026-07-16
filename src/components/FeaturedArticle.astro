@@ -1,0 +1,164 @@
+---
+/**
+ * FeaturedArticle — A História em Destaque.
+ * Ocupa espaço generoso, imagem grande e clara chamada para ação.
+ */
+interface Props {
+  title: string;
+  excerpt: string;
+  readTime: string;
+  category: string;
+  image: string;
+  href: string;
+}
+
+const { title, excerpt, readTime, category, image, href } = Astro.props;
+---
+
+<article class="featured-article">
+  <a href={href} class="featured-article__link-wrapper" aria-label={`Ler a história: ${title}`}>
+    <div class="featured-article__image-container">
+      <!-- Usando div com background temporariamente para mock. No futuro, usar <Image /> do Astro -->
+      <div class="featured-article__image" style={`background-image: url('${image}')`}></div>
+      <div class="featured-article__overlay"></div>
+    </div>
+    
+    <div class="featured-article__content">
+      <div class="featured-article__meta">
+        <span class="meta-category">{category}</span>
+        <span class="meta-dot">&middot;</span>
+        <span class="meta-time">{readTime}</span>
+      </div>
+      
+      <h2 class="featured-article__title">{title}</h2>
+      
+      <p class="featured-article__excerpt">{excerpt}</p>
+      
+      <span class="featured-article__cta">Ler história &rarr;</span>
+    </div>
+  </a>
+</article>
+
+<style>
+  .featured-article {
+    background-color: var(--surface-card);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    transition: transform var(--transition-base), box-shadow var(--transition-base), border-color var(--transition-base);
+  }
+
+  .featured-article__link-wrapper {
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    color: inherit;
+    height: 100%;
+  }
+
+  .featured-article__image-container {
+    position: relative;
+    width: 100%;
+    height: 300px;
+    overflow: hidden;
+  }
+
+  .featured-article__image {
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    transition: transform 10s ease;
+  }
+
+  .featured-article__overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, var(--surface-card) 0%, transparent 100%);
+    opacity: 0.8;
+  }
+
+  .featured-article__content {
+    padding: var(--space-6) var(--space-8) var(--space-8);
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+  }
+
+  .featured-article__meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-family: var(--font-alt);
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-starlight-gold);
+    margin-bottom: var(--space-4);
+  }
+
+  .meta-time {
+    color: var(--color-ivory-subtle);
+  }
+
+  .featured-article__title {
+    font-family: var(--font-heading);
+    font-size: var(--text-3xl);
+    font-weight: var(--weight-semibold);
+    line-height: 1.2;
+    color: var(--color-ivory);
+    margin-bottom: var(--space-4);
+    transition: color var(--transition-fast), text-shadow var(--transition-fast);
+  }
+
+  .featured-article__excerpt {
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    color: var(--color-ivory-muted);
+    line-height: 1.6;
+    margin-bottom: var(--space-8);
+    flex-grow: 1;
+  }
+
+  .featured-article__cta {
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    color: var(--color-ivory);
+    transition: color var(--transition-fast);
+    align-self: flex-start;
+  }
+
+  /* Microinterações */
+  .featured-article:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(10, 16, 38, 0.8),
+                0 0 40px rgba(212, 176, 106, 0.05); /* Sombra aquece discretamente */
+    border-color: var(--border-strong);
+  }
+
+  .featured-article:hover .featured-article__title {
+    color: var(--color-starlight-gold);
+    text-shadow: 0 0 12px rgba(212, 176, 106, 0.2);
+  }
+
+  .featured-article:hover .featured-article__image {
+    transform: scale(1.05); /* Zoom muito lento na imagem */
+  }
+
+  .featured-article:hover .featured-article__cta {
+    color: var(--color-starlight-gold);
+  }
+
+  @media (min-width: 1024px) {
+    .featured-article__image-container {
+      height: 400px;
+    }
+    .featured-article__content {
+      padding: var(--space-8) var(--space-10) var(--space-10);
+    }
+    .featured-article__title {
+      font-size: var(--text-4xl);
+    }
+  }
+</style>

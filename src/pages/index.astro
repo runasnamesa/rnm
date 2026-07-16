@@ -1,17 +1,248 @@
 ---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import IndexHero from '../components/IndexHero.astro';
+import Sidebar from '../components/Sidebar.astro';
+import FeaturedArticle from '../components/FeaturedArticle.astro';
+import ArticleCard from '../components/ArticleCard.astro';
 
+// Dados fictícios para prototipagem visual
+const featuredPost = {
+  title: "A Tempestade de Inverno em Vallak",
+  excerpt: "Uma campanha que começou como uma simples missão de escolta, mas se transformou em uma luta desesperada pela sobrevivência contra o frio e os deuses esquecidos.",
+  readTime: "8 min de leitura",
+  category: "Narrativa",
+  image: "https://images.unsplash.com/photo-1542224566-6e85f2e6772f?q=80&w=2000&auto=format&fit=crop",
+  href: "#",
+};
+
+const recentPosts = [
+  {
+    title: "Como construir um vilão que os jogadores amem odiar",
+    excerpt: "Vilões bidimensionais são esquecidos. Descubra como dar motivações reais para o seu antagonista.",
+    readTime: "5 min de leitura",
+    category: "Guias",
+    image: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=800&auto=format&fit=crop",
+    href: "#",
+  },
+  {
+    title: "O silêncio na mesa de RPG",
+    excerpt: "Por que mestres e jogadores têm tanto medo do silêncio? E como usá-lo a favor da narrativa.",
+    readTime: "4 min de leitura",
+    category: "Reflexões",
+    image: "https://images.unsplash.com/photo-1478147427282-58a87a120781?q=80&w=800&auto=format&fit=crop",
+    href: "#",
+  },
+  {
+    title: "A Lore oculta de Elyria",
+    excerpt: "Notas sobre a queda do Império de Cristal e os artefatos perdidos na névoa.",
+    readTime: "12 min de leitura",
+    category: "Lore",
+    image: "https://images.unsplash.com/photo-1532012197267-da84d127e765?q=80&w=800&auto=format&fit=crop",
+    href: "#",
+  },
+  {
+    title: "Mecânicas de Exaustão Simplificadas",
+    excerpt: "Uma abordagem mais narrativa e menos punitiva para longas viagens no seu cenário.",
+    readTime: "6 min de leitura",
+    category: "RPG",
+    image: "https://images.unsplash.com/photo-1605806616949-1e87b487cb2a?q=80&w=800&auto=format&fit=crop",
+    href: "#",
+  }
+];
+
+const categories = ["RPG", "Narrativa", "Guias", "Lore", "Reflexões"];
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<BaseLayout
+  title="Runas na Mesa — Sua Taverna para Histórias Épicas"
+  description="Um refúgio acolhedor para jogadores e mestres de RPG. Descanse, aprenda e prepare-se para a próxima aventura."
+>
+  <Fragment slot="head">
+    <script is:inline>
+      // Blocking script para evitar "flash of content"
+      // Se não houver o cookie, redireciona para a Welcome
+      (function() {
+        var cookies = document.cookie.split(';');
+        var welcomeCookie = cookies.find(function(c) { 
+          return c.trim().startsWith('rnm_welcome_last_seen='); 
+        });
+        
+        if (!welcomeCookie) {
+          window.location.replace('/welcome');
+        } else {
+          var timestampStr = welcomeCookie.split('=')[1];
+          var lastSeen = parseInt(timestampStr, 10);
+          if (!isNaN(lastSeen)) {
+            var now = Date.now();
+            var daysUntilShowAgain = 2; // Config padrão (sincronizada com config principal)
+            var daysInMs = daysUntilShowAgain * 24 * 60 * 60 * 1000;
+            if ((now - lastSeen) > daysInMs) {
+              window.location.replace('/welcome');
+            }
+          }
+        }
+      })();
+    </script>
+  </Fragment>
+
+  <IndexHero />
+
+  <div class="index-layout container container--wide">
+    <!-- Coluna Principal -->
+    <div class="index-main">
+      
+      <!-- Seção: Destaque -->
+      <section class="index-section" aria-label="História em destaque">
+        <FeaturedArticle {...featuredPost} />
+      </section>
+
+      <!-- Seção: Últimos Textos -->
+      <section class="index-section" aria-label="Últimos textos">
+        <h2 class="section-title">Últimos Textos</h2>
+        <div class="articles-grid">
+          {recentPosts.map((post) => (
+            <ArticleCard {...post} />
+          ))}
+        </div>
+      </section>
+
+      <!-- Seção: Categorias e Continue Explorando -->
+      <section class="index-section explore-section" aria-label="Navegação de categorias">
+        <h2 class="section-title">Categorias</h2>
+        <ul class="categories-list" role="list">
+          {categories.map((cat) => (
+            <li><a href="#" class="category-link">{cat}</a></li>
+          ))}
+        </ul>
+
+        <div class="explore-more">
+          <h2 class="section-title">Continue Explorando</h2>
+          <p class="explore-text">Ainda procurando algo? Visite o <a href="/arquivo">Arquivo Completo</a>.</p>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- Coluna Lateral (Desktop) -->
+    <div class="index-sidebar-col">
+      <Sidebar />
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .index-layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-12);
+    padding-bottom: var(--space-24);
+  }
+
+  .index-main {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-16);
+  }
+
+  .index-sidebar-col {
+    display: none;
+  }
+
+  .index-section {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .section-title {
+    font-family: var(--font-heading);
+    font-size: var(--text-2xl);
+    font-weight: var(--weight-medium);
+    color: var(--color-starlight-gold);
+    margin-bottom: var(--space-8);
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+  }
+
+  .section-title::after {
+    content: '';
+    flex-grow: 1;
+    height: 1px;
+    background: linear-gradient(90deg, var(--border-default), transparent);
+  }
+
+  .articles-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-8);
+  }
+
+  /* Seção Categorias */
+  .explore-section {
+    gap: var(--space-12);
+  }
+
+  .categories-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+  }
+
+  .category-link {
+    display: inline-block;
+    padding: var(--space-2) var(--space-6);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-full);
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    color: var(--color-ivory-muted);
+    transition: all var(--transition-fast);
+  }
+
+  .category-link:hover {
+    color: var(--color-deep-space);
+    background-color: var(--color-starlight-gold);
+    border-color: var(--color-starlight-gold);
+    box-shadow: 0 0 16px rgba(212, 176, 106, 0.4);
+  }
+
+  .explore-text {
+    color: var(--color-ivory-muted);
+    font-size: var(--text-base);
+  }
+  
+  .explore-text a {
+    color: var(--color-starlight-gold);
+    text-decoration: underline;
+    text-decoration-color: transparent;
+    transition: text-decoration-color var(--transition-fast);
+  }
+
+  .explore-text a:hover {
+    text-decoration-color: var(--color-starlight-gold);
+  }
+
+  /* Responsividade */
+  @media (min-width: 640px) {
+    .articles-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .index-layout {
+      grid-template-columns: 7fr 3fr;
+      gap: var(--space-16);
+    }
+
+    .index-sidebar-col {
+      display: block;
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .index-layout {
+      gap: var(--space-20);
+    }
+  }
+</style>

@@ -1,0 +1,243 @@
+---
+/**
+ * Footer — O chão da taverna.
+ *
+ * Sólido, discreto, acolhedor. Três colunas com links de navegação,
+ * comunidade e uma descrição do projeto.
+ *
+ * Reutilização: presente em todas as páginas via BaseLayout.
+ */
+
+const currentYear = new Date().getFullYear();
+
+interface FooterLink {
+  label: string;
+  href: string;
+}
+
+const exploreLinks: FooterLink[] = [
+  { label: 'Início', href: '/' },
+  { label: 'Guias', href: '/guias' },
+  { label: 'Lore', href: '/lore' },
+  { label: 'Taverna', href: '/taverna' },
+  { label: 'Sobre', href: '/sobre' },
+];
+
+const communityLinks: FooterLink[] = [
+  { label: 'Substack', href: '#' },
+  { label: 'Instagram', href: '#' },
+  { label: 'Discord', href: '#' },
+];
+---
+
+<footer class="footer" role="contentinfo">
+  <!-- Borda dourada superior -->
+  <div class="footer__border" aria-hidden="true"></div>
+
+  <div class="footer__inner container">
+    <!-- Coluna 1: Logo e descrição -->
+    <div class="footer__brand">
+      <a href="/" class="footer__logo" aria-label="Runas na Mesa — Página inicial">
+        <svg class="footer__logo-icon" width="24" height="24" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+          <path d="M14 2L2 14l12 12 12-12L14 2z" stroke="currentColor" stroke-width="1.5" fill="none" opacity="0.6"/>
+          <path d="M14 7l-7 7 7 7 7-7-7-7z" stroke="currentColor" stroke-width="1" fill="none" opacity="0.3"/>
+          <circle cx="14" cy="14" r="2" fill="currentColor" opacity="0.8"/>
+        </svg>
+        <span>Runas na Mesa</span>
+      </a>
+      <p class="footer__tagline">Sua taverna para histórias épicas.</p>
+      <p class="footer__description">
+        Um refúgio acolhedor para jogadores e mestres de RPG.
+        Aqui, você pode respirar, aprender e se preparar para a próxima aventura.
+      </p>
+    </div>
+
+    <!-- Coluna 2: Explorar -->
+    <div class="footer__column">
+      <h3 class="footer__heading">Explorar</h3>
+      <ul class="footer__links" role="list">
+        {exploreLinks.map((link) => (
+          <li>
+            <a href={link.href} class="footer__link">{link.label}</a>
+          </li>
+        ))}
+      </ul>
+    </div>
+
+    <!-- Coluna 3: Comunidade -->
+    <div class="footer__column">
+      <h3 class="footer__heading">Comunidade</h3>
+      <ul class="footer__links" role="list">
+        {communityLinks.map((link) => (
+          <li>
+            <a href={link.href} class="footer__link" target="_blank" rel="noopener noreferrer">
+              {link.label}
+              <svg class="footer__external-icon" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                <path d="M3.5 8.5l5-5M4 3.5h5v5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </div>
+
+  <!-- Copyright -->
+  <div class="footer__bottom container">
+    <p class="footer__copyright">
+      &copy; {currentYear} Runas na Mesa. Feito com
+      <span class="footer__heart" aria-label="amor">&#9830;</span>
+      para aventureiros.
+    </p>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    position: relative;
+    background: var(--surface-tavern);
+    margin-top: auto;
+    padding-top: var(--space-16);
+  }
+
+  .footer__border {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      var(--color-starlight-gold) 30%,
+      var(--color-soft-gold) 50%,
+      var(--color-starlight-gold) 70%,
+      transparent 100%
+    );
+    opacity: 0.25;
+  }
+
+  .footer__inner {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-10);
+    padding-bottom: var(--space-12);
+  }
+
+  /* Coluna Brand */
+  .footer__brand {
+    max-width: 320px;
+  }
+
+  .footer__logo {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    font-weight: var(--weight-semibold);
+    color: var(--color-ivory);
+    letter-spacing: 0.05em;
+    transition: opacity var(--transition-fast);
+  }
+
+  .footer__logo:hover {
+    opacity: 0.85;
+  }
+
+  .footer__logo-icon {
+    color: var(--color-starlight-gold);
+    flex-shrink: 0;
+  }
+
+  .footer__tagline {
+    margin-top: var(--space-3);
+    font-family: var(--font-heading);
+    font-style: italic;
+    font-size: var(--text-sm);
+    color: var(--color-starlight-gold);
+  }
+
+  .footer__description {
+    margin-top: var(--space-3);
+    font-size: var(--text-sm);
+    color: var(--color-ivory-muted);
+    line-height: 1.7;
+  }
+
+  /* Colunas */
+  .footer__column {
+    min-width: 0;
+  }
+
+  .footer__heading {
+    font-family: var(--font-heading);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+    color: var(--color-ivory);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: var(--space-4);
+  }
+
+  .footer__links {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .footer__link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    font-size: var(--text-sm);
+    color: var(--color-ivory-muted);
+    transition: color var(--transition-fast);
+  }
+
+  .footer__link:hover {
+    color: var(--color-starlight-gold);
+  }
+
+  .footer__external-icon {
+    opacity: 0.5;
+    transition: opacity var(--transition-fast);
+  }
+
+  .footer__link:hover .footer__external-icon {
+    opacity: 0.8;
+  }
+
+  /* Bottom bar */
+  .footer__bottom {
+    border-top: 1px solid var(--border-subtle);
+    padding-block: var(--space-6);
+  }
+
+  .footer__copyright {
+    font-size: var(--text-xs);
+    color: var(--color-ivory-subtle);
+    text-align: center;
+    letter-spacing: 0.02em;
+  }
+
+  .footer__heart {
+    color: var(--color-starlight-gold);
+    font-size: 0.7em;
+  }
+
+  /* Tablet */
+  @media (min-width: 640px) {
+    .footer__inner {
+      grid-template-columns: 1.5fr 1fr 1fr;
+      gap: var(--space-12);
+    }
+  }
+
+  /* Desktop */
+  @media (min-width: 1024px) {
+    .footer__inner {
+      gap: var(--space-20);
+    }
+  }
+</style>

@@ -1,0 +1,91 @@
+---
+/**
+ * Botão principal de entrada.
+ * Foca no efeito de hover (brilho suave e leve elevação) sem distrações.
+ */
+interface Props {
+  id?: string;
+  label: string;
+}
+
+const { id, label } = Astro.props;
+---
+
+<button class="welcome-btn" id={id} type="button" aria-label={label}>
+  <span class="welcome-btn__text">{label}</span>
+  <!-- Partículas decorativas internas (opcional no hover) -->
+  <span class="welcome-btn__glint" aria-hidden="true"></span>
+</button>
+
+<style>
+  .welcome-btn {
+    position: relative;
+    background: transparent;
+    border: 1px solid var(--border-default);
+    padding: var(--space-4) var(--space-12);
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    overflow: hidden;
+    transition: all var(--transition-base);
+    
+    /* Efeito de vidro sutil no estado natural */
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    background-color: rgba(20, 43, 82, 0.2);
+  }
+
+  .welcome-btn__text {
+    position: relative;
+    z-index: 2;
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    font-weight: var(--weight-medium);
+    color: var(--color-ivory-muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transition: color var(--transition-base), text-shadow var(--transition-base);
+  }
+
+  .welcome-btn__glint {
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(
+      90deg, 
+      transparent, 
+      rgba(212, 176, 106, 0.2), 
+      transparent
+    );
+    transform: skewX(-20deg);
+    transition: none;
+    z-index: 1;
+  }
+
+  .welcome-btn:hover {
+    border-color: var(--color-starlight-gold);
+    background-color: rgba(20, 43, 82, 0.4);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-glow);
+  }
+
+  .welcome-btn:hover .welcome-btn__text {
+    color: var(--color-starlight-gold);
+    text-shadow: 0 0 10px rgba(212, 176, 106, 0.4);
+  }
+
+  .welcome-btn:hover .welcome-btn__glint {
+    animation: glint-slide 1.5s ease-in-out infinite;
+  }
+
+  .welcome-btn:focus-visible {
+    outline: 2px solid var(--color-starlight-gold);
+    outline-offset: 4px;
+  }
+
+  @keyframes glint-slide {
+    0% { left: -100%; }
+    100% { left: 200%; }
+  }
+</style>

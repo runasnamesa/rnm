@@ -1,0 +1,222 @@
+---
+import Snow from './Snow.astro';
+import WelcomeButton from './WelcomeButton.astro';
+import AudioToggle from '../AudioToggle.astro';
+import { WELCOME_CONFIG } from '../../config/welcome.config';
+---
+
+<div class="welcome-scene" id="welcome-scene">
+  <!-- Fundo da montanha nevada -->
+  <div class="welcome-scene__background" id="welcome-bg"></div>
+  
+  <!-- Sistema de partículas de neve -->
+  <Snow count={WELCOME_CONFIG.particles.count} speed={WELCOME_CONFIG.particles.speed} />
+  
+  <!-- A taverna no centro (Placeholder por enquanto, usa gradientes para criar a atmosfera) -->
+  <div class="welcome-scene__tavern" id="welcome-tavern">
+    <div class="tavern-glow"></div>
+  </div>
+
+  <!-- Camada de sobreposição para o fade cálido final -->
+  <div class="welcome-scene__warm-overlay" id="warm-overlay"></div>
+
+  <!-- UI Frontal -->
+  <div class="welcome-scene__ui" id="welcome-ui">
+    <h1 class="welcome-scene__title glow-text sr-only">Runas na Mesa</h1>
+    
+    <div class="welcome-scene__center">
+      <WelcomeButton id="enter-button" label={WELCOME_CONFIG.text.button} />
+    </div>
+    
+    <div class="welcome-scene__bottom">
+      <button class="skip-btn" id="skip-btn" aria-label="Pular introdução">
+        {WELCOME_CONFIG.text.skip} {WELCOME_CONFIG.daysUntilShowAgain} {WELCOME_CONFIG.text.skipDays}
+      </button>
+      
+      <AudioToggle />
+    </div>
+  </div>
+</div>
+
+<style>
+  .welcome-scene {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    perspective: 1000px;
+    background-color: var(--color-deep-space);
+  }
+
+  /* O Background e a Taverna estão em um container que fará o "zoom in" */
+  .welcome-scene__background,
+  .welcome-scene__tavern {
+    position: absolute;
+    inset: -5%; /* Margem extra para permitir scale sem mostrar bordas */
+    width: 110%;
+    height: 110%;
+    transform-origin: center center;
+    transition: transform 3s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* Duração animada via JS se necessário */
+    will-change: transform;
+  }
+
+  .welcome-scene__background {
+    background: 
+      radial-gradient(ellipse at bottom, #1B2735 0%, var(--color-deep-space) 100%);
+    z-index: 1;
+  }
+
+  .welcome-scene__tavern {
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* Placeholder temporário para a taverna (como uma janela distante) */
+    background: radial-gradient(circle at center, transparent 30%, rgba(10,16,38, 0.8) 70%);
+  }
+
+  .tavern-glow {
+    width: 150px;
+    height: 150px;
+    background: radial-gradient(circle, var(--color-starlight-gold) 0%, transparent 70%);
+    opacity: 0.6;
+    animation: tavern-pulse 4s infinite alternate ease-in-out;
+  }
+
+  @keyframes tavern-pulse {
+    0% { opacity: 0.5; transform: scale(0.95); }
+    100% { opacity: 0.8; transform: scale(1.05); }
+  }
+
+  /* Overlay Quente - A luz invadindo a tela no final */
+  .welcome-scene__warm-overlay {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at center, var(--color-soft-gold) 0%, var(--color-starlight-gold) 100%);
+    opacity: 0;
+    z-index: 10;
+    pointer-events: none;
+    mix-blend-mode: overlay; /* Transição mágica e cálida */
+    transition: opacity 2.5s ease-in;
+    will-change: opacity;
+  }
+
+  .welcome-scene__ui {
+    position: absolute;
+    inset: 0;
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Centraliza verticalmente por padrão */
+    padding: var(--space-6);
+    transition: opacity 1s ease;
+  }
+
+  .welcome-scene__center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-6);
+  }
+
+  .welcome-scene__bottom {
+    position: absolute;
+    bottom: var(--space-8);
+    left: var(--space-8);
+    right: var(--space-8);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .skip-btn {
+    background: transparent;
+    border: none;
+    color: var(--color-ivory-subtle);
+    font-family: var(--font-body);
+    font-size: var(--text-xs);
+    cursor: pointer;
+    transition: color var(--transition-fast);
+    padding: 0;
+  }
+
+  .skip-btn:hover {
+    color: var(--color-ivory);
+  }
+
+  /* Classe animadora da câmera */
+  :global(.zooming-in) .welcome-scene__background {
+    transform: scale(2.5);
+  }
+  
+  :global(.zooming-in) .welcome-scene__tavern {
+    transform: scale(3.5);
+  }
+
+  :global(.zooming-in) .welcome-scene__warm-overlay {
+    opacity: 1;
+    background: var(--color-starlight-gold); /* Fica opaco dourado no fim */
+    mix-blend-mode: normal; /* Sobrescreve tudo */
+  }
+
+  :global(.zooming-in) .welcome-scene__ui {
+    opacity: 0;
+    pointer-events: none;
+  }
+</style>
+
+<script>
+  import { setWelcomeSeenCookie } from '../../lib/welcome';
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const enterBtn = document.getElementById('enter-button');
+    const skipBtn = document.getElementById('skip-btn');
+    const scene = document.getElementById('welcome-scene');
+
+    // Duração baseada no tempo de transição do CSS (aprox 3s)
+    const animationDuration = 3000;
+
+    const playCinematicAndEnter = () => {
+      // Checa prefers-reduced-motion
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      // Desabilita interação durante a animação
+      if(enterBtn) enterBtn.style.pointerEvents = 'none';
+
+      // Marca o cookie
+      setWelcomeSeenCookie();
+
+      if (prefersReducedMotion) {
+        // Fallback rápido
+        document.body.classList.add('fade-out');
+        setTimeout(() => { window.location.assign('/'); }, 500);
+        return;
+      }
+
+      // Adiciona a classe que engatilha o CSS Transition (o zoom da câmera)
+      if(scene) scene.classList.add('zooming-in');
+
+      // Toca um som de porta abrindo (placeholder se não houver asset)
+      // Um pequeno ruído branco ou rangido sintetizado poderia ir aqui, 
+      // ou apenas deixamos a música ambiente fazer seu papel.
+
+      // Aguarda a transição terminar para navegar
+      setTimeout(() => {
+        window.location.assign('/');
+      }, animationDuration);
+    };
+
+    if (enterBtn) {
+      enterBtn.addEventListener('click', playCinematicAndEnter);
+    }
+
+    if (skipBtn) {
+      skipBtn.addEventListener('click', () => {
+        setWelcomeSeenCookie();
+        document.body.classList.add('fade-out');
+        setTimeout(() => { window.location.assign('/'); }, 300);
+      });
+    }
+  });
+</script>

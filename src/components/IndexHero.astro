@@ -1,0 +1,114 @@
+---
+/**
+ * IndexHero — Cabeçalho minimalista da Taverna (Home).
+ * Sem botões, sem ruído. Apenas um h1 e um convite contemplativo.
+ */
+---
+
+<header class="index-hero">
+  <h1 class="index-hero__title glow-text">Runas na Mesa</h1>
+  <p class="index-hero__subtitle">
+    Seja bem vindo ao seu descanso, aventureiro.
+  </p>
+
+  <div class="index-hero__divider" aria-hidden="true">
+    <span class="divider-line"></span>
+    <span class="divider-diamond"></span>
+    <span class="divider-line"></span>
+  </div>
+</header>
+
+<style>
+  .index-hero {
+    text-align: center;
+    padding-top: var(--space-20);
+    padding-bottom: var(--space-12);
+  }
+
+  .index-hero__title {
+    font-family: var(--font-display);
+    font-size: var(--text-5xl);
+    font-weight: var(--weight-bold);
+    color: var(--color-ivory);
+    letter-spacing: 0.05em;
+    margin-bottom: var(--space-4);
+
+    /* Animação suave de entrada */
+    opacity: 0;
+    animation: fadeInDown 800ms ease-out forwards;
+  }
+
+  .index-hero__subtitle {
+    font-family: var(--font-heading);
+    font-size: var(--text-lg);
+    font-weight: var(--weight-regular);
+    font-style: italic;
+    color: var(--color-starlight-gold);
+    letter-spacing: 0.02em;
+
+    opacity: 0;
+    animation: fadeInDown 800ms ease-out 200ms forwards;
+  }
+
+  .index-hero__divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-3);
+    margin-top: var(--space-8);
+    opacity: 0;
+    animation: fadeIn 800ms ease-out 400ms forwards;
+  }
+
+  .divider-line {
+    display: block;
+    width: 60px;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      var(--color-starlight-gold)
+    );
+    opacity: 0.4;
+  }
+
+  .divider-line:last-child {
+    background: linear-gradient(
+      90deg,
+      var(--color-starlight-gold),
+      transparent
+    );
+  }
+
+  .divider-diamond {
+    width: 6px;
+    height: 6px;
+    background: var(--color-starlight-gold);
+    transform: rotate(45deg);
+    opacity: 0.5;
+  }
+
+  @keyframes fadeInDown {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @media (min-width: 768px) {
+    .index-hero {
+      padding-top: var(--space-24);
+      padding-bottom: var(--space-16);
+    }
+    .index-hero__title {
+      font-size: var(--text-6xl);
+    }
+    .divider-line {
+      width: 100px;
+    }
+  }
+</style>

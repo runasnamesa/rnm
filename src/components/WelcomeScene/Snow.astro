@@ -1,0 +1,150 @@
+---
+/**
+ * Sistema de partículas leves de neve utilizando HTML Canvas.
+ * É renderizado atrás da UI e reage de forma suave.
+ * Pausa automaticamente se o usuário pedir redução de movimento ou se
+ * a página perder a visibilidade (GPU friendly).
+ */
+interface Props {
+  count?: number;
+  speed?: number;
+}
+
+const { count = 100, speed = 1 } = Astro.props;
+---
+
+<canvas id="snow-canvas" class="snow-canvas" aria-hidden="true" data-count={count} data-speed={speed}></canvas>
+
+<style>
+  .snow-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 5;
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const canvas = document.getElementById('snow-canvas') as HTMLCanvasElement;
+    if (!canvas) return;
+
+    // Acessibilidade
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReducedMotion) return; // Não desenha nada
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    let width = 0;
+    let height = 0;
+    let particles: Particle[] = [];
+    let animationFrameId: number;
+    let isVisible = true;
+
+    // Configurações
+    const particleCount = parseInt(canvas.getAttribute('data-count') || '100', 10);
+    const speedMultiplier = parseFloat(canvas.getAttribute('data-speed') || '1');
+
+    class Particle {
+      x: number;
+      y: number;
+      r: number; // radius
+      d: number; // density / speed factor
+      alpha: number;
+
+      constructor() {
+        this.x = Math.random() * width;
+        this.y = Math.random() * height;
+        this.r = Math.random() * 2 + 0.5; // Tamanho entre 0.5 e 2.5
+        this.d = Math.random() * particleCount; // Densidade
+        this.alpha = Math.random() * 0.5 + 0.1; // Opacidade
+      }
+
+      update(angle: number) {
+        // Movimento lateral suave e queda
+        this.y += (Math.cos(this.d) + 1 + this.r / 2) * speedMultiplier;
+        this.x += Math.sin(angle) * 1 * speedMultiplier;
+
+        // Se sair da tela, reseta no topo
+        if (this.x > width + 5 || this.x < -5 || this.y > height) {
+          if (Math.random() > 1 / 3) {
+            // Volta pro topo randomicamente
+            this.x = Math.random() * width;
+            this.y = -10;
+          } else {
+            // Saiu pelas laterais, volta do outro lado
+            if (Math.sin(angle) > 0) {
+              this.x = -5;
+              this.y = Math.random() * height;
+            } else {
+              this.x = width + 5;
+              this.y = Math.random() * height;
+            }
+          }
+        }
+      }
+
+      draw() {
+        if (!ctx) return;
+        ctx.fillStyle = `rgba(248, 246, 238, ${this.alpha})`;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2, true);
+        ctx.fill();
+      }
+    }
+
+    const init = () => {
+      width = window.innerWidth;
+      height = window.innerHeight;
+      canvas.width = width;
+      canvas.height = height;
+
+      particles = [];
+      for (let i = 0; i < particleCount; i++) {
+        particles.push(new Particle());
+      }
+    };
+
+    let angle = 0;
+    const render = () => {
+      if (!isVisible) return; // Economiza CPU se não estiver visível
+
+      ctx.clearRect(0, 0, width, height);
+      angle += 0.01;
+
+      particles.forEach(p => {
+        p.update(angle);
+        p.draw();
+      });
+
+      animationFrameId = requestAnimationFrame(render);
+    };
+
+    // Resize com debounce
+    let resizeTimer: number;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        init();
+      }, 200) as unknown as number;
+    });
+
+    // Page Visibility API (Performance)
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) {
+        isVisible = false;
+        cancelAnimationFrame(animationFrameId);
+      } else {
+        isVisible = true;
+        render();
+      }
+    });
+
+    // Inicia
+    init();
+    render();
+  });
+</script>

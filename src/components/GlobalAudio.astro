@@ -1,0 +1,67 @@
+---
+import { WELCOME_CONFIG } from "../config/welcome.config";
+---
+
+<audio
+  id="global-ambient-audio"
+  loop
+  preload="auto"
+  transition:persist="ambient-audio"
+>
+  <source src={WELCOME_CONFIG.audio.src} type="audio/mp4" />
+</audio>
+
+<script>
+  // Script leve apenas para restaurar o estado na primeira carga da página.
+  // Graças ao transition:persist, esse elemento se mantém vivo durante a navegação.
+  document.addEventListener(
+    "astro:page-load",
+    () => {
+      const audioEl = document.getElementById(
+        "global-ambient-audio",
+      ) as HTMLAudioElement;
+      if (!audioEl) return;
+
+      // Apenas na primeira inicialização real (evita resetar durante navegação)
+      if (!(window as any).audioInitialized) {
+        (window as any).audioInitialized = true;
+
+        const savedVolume = localStorage.getItem("rnm_audio_volume");
+        const savedPlaying = localStorage.getItem("rnm_audio_playing");
+
+        // Volume inicial de 20% conforme pedido (0.2), ou o salvo
+        audioEl.volume = savedVolume ? parseFloat(savedVolume) : 0.2;
+
+        // Tenta tocar se for a primeira visita ou se o usuário deixou ativado
+        if (savedPlaying === "true" || savedPlaying === null) {
+          const playPromise = audioEl.play();
+          if (playPromise !== undefined) {
+            playPromise.then(() => {
+               localStorage.setItem("rnm_audio_playing", "true");
+            }).catch(() => {
+              console.log("Autoplay bloqueado pelo navegador. Aguardando primeira interação para tocar.");
+              
+              // Se o navegador bloqueou, tentamos tocar no primeiro clique/interação na tela
+              const startOnInteraction = () => {
+                // Se o usuário já não pausou manualmente
+                if (localStorage.getItem("rnm_audio_playing") !== "false") {
+                  audioEl.play().then(() => {
+                    localStorage.setItem("rnm_audio_playing", "true");
+                    // Força o AudioToggle a atualizar visualmente
+                    audioEl.dispatchEvent(new Event('play'));
+                  }).catch(() => {});
+                }
+                document.removeEventListener('click', startOnInteraction);
+                document.removeEventListener('keydown', startOnInteraction);
+              };
+
+              document.addEventListener('click', startOnInteraction);
+              document.addEventListener('keydown', startOnInteraction);
+            });
+          }
+        }
+      }
+    },
+    { once: false },
+  );
+</script>
