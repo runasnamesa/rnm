@@ -4,6 +4,7 @@ import WelcomeScene from '../components/WelcomeScene/WelcomeScene.astro';
 import GlobalAudio from '../components/GlobalAudio.astro';
 import AudioToggle from '../components/AudioToggle.astro';
 import { WELCOME_CONFIG } from '../config/welcome.config';
+import '../styles/global.css';
 ---
 
 <!DOCTYPE html>
@@ -26,7 +27,6 @@ import { WELCOME_CONFIG } from '../config/welcome.config';
     />
     
     <!-- CSS Global (apenas variáveis necessárias ou reset, para manter ultraleve) -->
-    <link rel="stylesheet" href="/src/styles/global.css" />
 
     <ClientRouter />
     

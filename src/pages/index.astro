@@ -63,10 +63,10 @@ const categories = ["RPG", "Narrativa", "Guias", "Lore", "Reflexões"];
       // Se não houver o cookie, redireciona para a Welcome
       (function() {
         var cookies = document.cookie.split(';');
-        var welcomeCookie = cookies.find(function(c) { 
-          return c.trim().startsWith('rnm_welcome_last_seen='); 
+        var welcomeCookie = cookies.find(function(c) {
+          return c.trim().startsWith('rnm_welcome_last_seen=');
         });
-        
+
         if (!welcomeCookie) {
           window.location.replace('/welcome');
         } else {
@@ -90,7 +90,7 @@ const categories = ["RPG", "Narrativa", "Guias", "Lore", "Reflexões"];
   <div class="index-layout container container--wide">
     <!-- Coluna Principal -->
     <div class="index-main">
-      
+
       <!-- Seção: Destaque -->
       <section class="index-section" aria-label="História em destaque">
         <FeaturedArticle {...featuredPost} />
@@ -210,7 +210,7 @@ const categories = ["RPG", "Narrativa", "Guias", "Lore", "Reflexões"];
     color: var(--color-ivory-muted);
     font-size: var(--text-base);
   }
-  
+
   .explore-text a {
     color: var(--color-starlight-gold);
     text-decoration: underline;
