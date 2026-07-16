@@ -1,4 +1,10 @@
-# Astro Starter Kit: Minimal
+# Runas na Mesa
+
+Site estático em Astro. A primeira visita abre a welcome em `/`; após entrar, a taverna está em `/index`.
+
+Os posts usam a coleção de conteúdo em `src/content/posts/` e são publicados automaticamente em `/posts/<slug>`. Consulte [docs/POSTS.md](docs/POSTS.md) para criar um novo texto.
+
+## Desenvolvimento
 
 ```sh
 npm create astro@latest -- --template minimal

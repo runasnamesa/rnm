@@ -14,7 +14,7 @@ interface NavLink {
 }
 
 const navLinks: NavLink[] = [
-  { label: 'Início', href: '/' },
+  { label: 'Início', href: '/index' },
   { label: 'Guias', href: '/guias' },
   { label: 'Lore', href: '/lore' },
   { label: 'Taverna', href: '/taverna' },
@@ -29,7 +29,7 @@ const currentPath = Astro.url.pathname;
 <header class="navbar" id="navbar">
   <div class="navbar__inner container">
     <!-- Logo -->
-    <a href="/" class="navbar__logo" aria-label="Runas na Mesa — Página inicial">
+    <a href="/index" class="navbar__logo" aria-label="Runas na Mesa — Página inicial">
       <!-- Ícone de runa estilizada -->
       <svg class="navbar__logo-icon" width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
         <path d="M14 2L2 14l12 12 12-12L14 2z" stroke="currentColor" stroke-width="1.5" fill="none" opacity="0.6"/>

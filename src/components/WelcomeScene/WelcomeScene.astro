@@ -190,7 +190,7 @@ import { WELCOME_CONFIG } from '../../config/welcome.config';
       if (prefersReducedMotion) {
         // Fallback rápido
         document.body.classList.add('fade-out');
-        setTimeout(() => { window.location.assign('/'); }, 500);
+        setTimeout(() => { window.location.assign('/index'); }, 500);
         return;
       }
 
@@ -203,7 +203,7 @@ import { WELCOME_CONFIG } from '../../config/welcome.config';
 
       // Aguarda a transição terminar para navegar
       setTimeout(() => {
-        window.location.assign('/');
+        window.location.assign('/index');
       }, animationDuration);
     };
 
@@ -215,7 +215,7 @@ import { WELCOME_CONFIG } from '../../config/welcome.config';
       skipBtn.addEventListener('click', () => {
         setWelcomeSeenCookie();
         document.body.classList.add('fade-out');
-        setTimeout(() => { window.location.assign('/'); }, 300);
+        setTimeout(() => { window.location.assign('/index'); }, 300);
       });
     }
   });

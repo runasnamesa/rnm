@@ -1,0 +1,37 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('posts', ({ data }) => !data.draft);
+  const categories = [...new Set(posts.map((post) => post.data.category))];
+  return categories.map((category) => ({
+    params: { category: category.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase() },
+    props: { category },
+  }));
+}
+const { category } = Astro.props;
+const posts = (await getCollection('posts', ({ data }) => !data.draft && data.category === category))
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+---
+
+<BaseLayout title={`${category} — Runas na Mesa`} description={`Textos da categoria ${category}.`}>
+  <section class="category container">
+    <a href="/arquivo">← Arquivo completo</a>
+    <h1>{category}</h1>
+    <ul>
+      {posts.map((post) => <li><a href={`/posts/${post.id}`}>{post.data.title}<span>{post.data.description}</span></a></li>)}
+    </ul>
+  </section>
+</BaseLayout>
+
+<style>
+  .category { max-width: 58rem; padding-block: var(--space-16); }
+  .category > a { color: var(--color-starlight-gold); }
+  h1 { color: var(--color-ivory); font-family: var(--font-heading); font-size: var(--text-4xl); margin: var(--space-6) 0 var(--space-10); }
+  ul { display: grid; gap: var(--space-4); }
+  li a { background: var(--surface-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); display: grid; gap: var(--space-2); padding: var(--space-6); }
+  li a:hover { border-color: var(--border-strong); }
+  li a { color: var(--color-ivory); font-family: var(--font-heading); font-size: var(--text-xl); }
+  li span { color: var(--color-ivory-muted); font-family: var(--font-body); font-size: var(--text-base); }
+</style>

@@ -43,5 +43,5 @@ export function setWelcomeSeenCookie(): void {
  */
 export function skipWelcomeNow(): void {
   setWelcomeSeenCookie();
-  window.location.assign('/');
+  window.location.assign('/index');
 }
