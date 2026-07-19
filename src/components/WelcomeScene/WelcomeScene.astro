@@ -178,8 +178,73 @@ import { WELCOME_CONFIG } from '../../config/welcome.config';
     const animationDuration = 3000;
 
     const playCinematicAndEnter = () => {
+        // Toca um som de confirmação curto tipo "plim" usando WebAudio.
+        // Reutiliza um AudioContext global para evitar limites do navegador.
+        const playConfirmTone = () => {
+          try {
+            const AudioCtx = (window as any).AudioContext || (window as any).webkitAudioContext;
+            if (!AudioCtx) return;
+
+            let ctx = (window as any).__rnm_confirm_ctx;
+            if (!ctx) {
+              ctx = new AudioCtx();
+              (window as any).__rnm_confirm_ctx = ctx;
+            }
+
+            if (ctx.state === 'suspended') {
+              ctx.resume().catch(() => {});
+            }
+
+            const now = ctx.currentTime;
+
+            // Dois osciladores para um timbre mais rico
+            const o1 = ctx.createOscillator();
+            const o2 = ctx.createOscillator();
+            const g = ctx.createGain();
+
+            o1.type = 'sine';
+            o2.type = 'sine';
+
+            o1.frequency.setValueAtTime(1200, now);
+            o1.frequency.exponentialRampToValueAtTime(700, now + 0.12);
+
+            o2.frequency.setValueAtTime(880, now);
+            o2.frequency.exponentialRampToValueAtTime(450, now + 0.12);
+
+            // Envelope rápido e suave (evita pops)
+            g.gain.setValueAtTime(0.0001, now);
+            g.gain.exponentialRampToValueAtTime(0.06, now + 0.01);
+            g.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+            g.gain.setValueAtTime(0, now + 0.3);
+
+            o1.connect(g);
+            o2.connect(g);
+            g.connect(ctx.destination);
+
+            o1.start(now);
+            o2.start(now);
+            o1.stop(now + 0.26);
+            o2.stop(now + 0.26);
+          } catch (e) {
+            // Falha silenciosa — silenciosamente ignoramos se não for possível
+          }
+        };
+
+        // Garante que a música ambiente esteja tocando (interação de usuário)
+        const ensureAmbientPlaying = () => {
+          const ambient = document.getElementById('global-ambient-audio') as HTMLAudioElement | null;
+          if (ambient) {
+            try {
+              ambient.play().catch(() => {});
+            } catch (e) {}
+          }
+        };
       // Checa prefers-reduced-motion
       const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      // toca confirmação e garante que a ambient esteja ativa
+      playConfirmTone();
+      ensureAmbientPlaying();
 
       // Desabilita interação durante a animação
       if(enterBtn) enterBtn.style.pointerEvents = 'none';

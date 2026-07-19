@@ -4,8 +4,10 @@ import { WELCOME_CONFIG } from "../config/welcome.config";
 
 <audio
   id="global-ambient-audio"
+  autoplay
   loop
   preload="auto"
+  playsinline
   transition:persist="ambient-audio"
 >
   <source src={WELCOME_CONFIG.audio.src} type="audio/mp4" />
@@ -14,9 +16,7 @@ import { WELCOME_CONFIG } from "../config/welcome.config";
 <script>
   // Script leve apenas para restaurar o estado na primeira carga da página.
   // Graças ao transition:persist, esse elemento se mantém vivo durante a navegação.
-  document.addEventListener(
-    "astro:page-load",
-    () => {
+  const initializeAudio = () => {
       const audioEl = document.getElementById(
         "global-ambient-audio",
       ) as HTMLAudioElement;
@@ -30,7 +30,7 @@ import { WELCOME_CONFIG } from "../config/welcome.config";
         const savedPlaying = localStorage.getItem("rnm_audio_playing");
 
         // Volume inicial de 20% conforme pedido (0.2), ou o salvo
-        audioEl.volume = savedVolume ? parseFloat(savedVolume) : 0.2;
+        audioEl.volume = savedVolume ? parseFloat(savedVolume) : 0.25;
 
         // Tenta tocar se for a primeira visita ou se o usuário deixou ativado
         if (savedPlaying === "true" || savedPlaying === null) {
@@ -61,7 +61,9 @@ import { WELCOME_CONFIG } from "../config/welcome.config";
           }
         }
       }
-    },
-    { once: false },
-  );
+  };
+
+  initializeAudio();
+  document.addEventListener('DOMContentLoaded', initializeAudio);
+  document.addEventListener('astro:page-load', initializeAudio);
 </script>
