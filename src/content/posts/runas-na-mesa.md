@@ -3,6 +3,9 @@ title: "Runas na Mesa"
 description: "Uma Taverna, um Ref&#250;gio, um Recanto. O Calor aconchegante da lareira que eu espero proporcionar."
 pubDate: 2026-07-08
 slug: "runas-na-mesa"
+category: "Narrativa"
+image: "https://substack-post-media.s3.amazonaws.com/public/images/2bceb906-cf9a-4e3c-8653-c4b67b4245ab_1199x667.jpeg"
+readTime: "5 min de leitura"
 origin: "Substack"
 link: "https://runasnamesa.substack.com/p/runas-na-mesa"
 ---

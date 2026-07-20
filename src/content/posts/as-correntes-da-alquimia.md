@@ -3,6 +3,9 @@ title: "As correntes da Alquimia"
 description: "O meu exemplo pessoal de quando uma hist&#243;ria simplesmente implora para acabar."
 pubDate: 2026-07-19
 slug: "as-correntes-da-alquimia"
+category: "Narrativa"
+image: "https://substackcdn.com/image/fetch/$s_!_en_!,w_1456,c_limit,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2Fa1d1d3f9-03af-46c5-ba9a-1e3c8d553eea_743x500.webp"
+readTime: "6 min de leitura"
 origin: "Substack"
 link: "https://runasnamesa.substack.com/p/as-correntes-da-alquimia"
 ---
