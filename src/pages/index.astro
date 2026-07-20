@@ -45,5 +45,13 @@ import '../styles/global.css';
     <!-- Áudio global com persistência -->
     <GlobalAudio />
     <WelcomeScene />
+
+    <!-- Cookie de boas-vindas: pula a intro se ainda estiver válida -->
+    <script>
+      import { shouldSkipWelcome } from '../lib/welcome';
+      if (shouldSkipWelcome()) {
+        window.location.replace('/index');
+      }
+    </script>
   </body>
 </html>

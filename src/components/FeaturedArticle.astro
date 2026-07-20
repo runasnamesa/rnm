@@ -5,14 +5,14 @@
  */
 interface Props {
   title: string;
-  excerpt: string;
+  description: string;
   readTime: string;
   category: string;
   image: string;
   href: string;
 }
 
-const { title, excerpt, readTime, category, image, href } = Astro.props;
+const { title, description, readTime, category, image, href } = Astro.props;
 ---
 
 <article class="featured-article">
@@ -32,7 +32,7 @@ const { title, excerpt, readTime, category, image, href } = Astro.props;
       
       <h2 class="featured-article__title">{title}</h2>
       
-      <p class="featured-article__excerpt">{excerpt}</p>
+      <p class="featured-article__excerpt">{description}</p>
       
       <span class="featured-article__cta">Ler história &rarr;</span>
     </div>

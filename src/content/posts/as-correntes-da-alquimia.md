@@ -1,6 +1,6 @@
 ---
 title: "As correntes da Alquimia"
-description: "O meu exemplo pessoal de quando uma hist&#243;ria simplesmente implora para acabar."
+description: "O meu exemplo pessoal de quando uma história simplesmente implora para acabar."
 pubDate: 2026-07-19
 slug: "as-correntes-da-alquimia"
 category: "Narrativa"

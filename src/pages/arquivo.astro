@@ -1,24 +1,27 @@
 ---
-import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { getPublishedPosts, postHref } from '../lib/posts';
 
-const posts = (await getCollection('posts', ({ data }) => !data.draft))
-  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+const posts = await getPublishedPosts();
 ---
 
 <BaseLayout title="Arquivo — Runas na Mesa" description="Todos os textos da Runas na Mesa.">
   <section class="archive container">
     <p class="eyebrow">Arquivo</p>
     <h1>Todos os textos</h1>
-    <div class="archive__list">
-      {posts.map((post) => (
-        <a href={`/posts/${post.id}`} class="archive__item">
-          <span>{post.data.category}</span>
-          <strong>{post.data.title}</strong>
-          <small>{post.data.description}</small>
-        </a>
-      ))}
-    </div>
+    {posts.length > 0 ? (
+      <div class="archive__list">
+        {posts.map((post) => (
+          <a href={postHref(post)} class="archive__item">
+            <span>{post.data.category}</span>
+            <strong>{post.data.title}</strong>
+            <small>{post.data.description}</small>
+          </a>
+        ))}
+      </div>
+    ) : (
+      <p class="empty">Nenhum texto publicado ainda.</p>
+    )}
   </section>
 </BaseLayout>
 
@@ -31,4 +34,5 @@ const posts = (await getCollection('posts', ({ data }) => !data.draft))
   .archive__item:hover { border-color: var(--border-strong); }
   strong { color: var(--color-ivory); font-family: var(--font-heading); font-size: var(--text-xl); }
   small { color: var(--color-ivory-muted); font-size: var(--text-base); }
+  .empty { color: var(--color-ivory-muted); margin-top: var(--space-10); font-size: var(--text-lg); }
 </style>

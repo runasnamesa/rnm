@@ -1,6 +1,6 @@
 ---
 title: "Runas na Mesa"
-description: "Uma Taverna, um Ref&#250;gio, um Recanto. O Calor aconchegante da lareira que eu espero proporcionar."
+description: "Uma Taverna, um Refúgio, um Recanto. O calor aconchegante da lareira que eu espero proporcionar."
 pubDate: 2026-07-08
 slug: "runas-na-mesa"
 category: "Narrativa"

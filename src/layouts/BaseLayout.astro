@@ -3,6 +3,7 @@ import { ClientRouter } from 'astro:transitions';
 import Navbar from '../components/Navbar.astro';
 import Footer from '../components/Footer.astro';
 import GlobalAudio from '../components/GlobalAudio.astro';
+import { SITE } from '../config/site';
 import '../styles/global.css';
 
 interface Props {
@@ -13,15 +14,19 @@ interface Props {
 
 const {
   title,
-  description = 'Runas na Mesa — Sua taverna para histórias épicas. Um refúgio acolhedor para jogadores e mestres de RPG.',
-  ogImage = '/og-default.jpg',
+  description = SITE.description,
+  ogImage = SITE.defaultOgImage,
 } = Astro.props;
 
-const canonicalURL = new URL(Astro.url.pathname, Astro.site ?? 'https://runasnamesa.com.br');
+const siteOrigin = Astro.site ?? new URL(SITE.url);
+const canonicalURL = new URL(Astro.url.pathname, siteOrigin);
+const ogImageURL = ogImage.startsWith('http')
+  ? ogImage
+  : new URL(ogImage, siteOrigin).href;
 ---
 
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang={SITE.lang}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -41,15 +46,15 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site ?? 'https://runasnam
     <meta property="og:url" content={canonicalURL} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:image" content={ogImage} />
-    <meta property="og:locale" content="pt_BR" />
-    <meta property="og:site_name" content="Runas na Mesa" />
+    <meta property="og:image" content={ogImageURL} />
+    <meta property="og:locale" content={SITE.locale} />
+    <meta property="og:site_name" content={SITE.name} />
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
-    <meta name="twitter:image" content={ogImage} />
+    <meta name="twitter:image" content={ogImageURL} />
 
     <!-- Google Fonts — Otimizadas -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />

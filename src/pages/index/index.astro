@@ -1,18 +1,19 @@
 ---
-import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import IndexHero from '../../components/IndexHero.astro';
 import Sidebar from '../../components/Sidebar.astro';
 import FeaturedArticle from '../../components/FeaturedArticle.astro';
 import ArticleCard from '../../components/ArticleCard.astro';
+import {
+  POST_CATEGORIES,
+  categorySlug,
+  getPublishedPosts,
+  postHref,
+} from '../../lib/posts';
 
-const posts = (await getCollection('posts'))
-  .filter((post) => !post.data.draft)
-  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+const posts = await getPublishedPosts();
 const featuredPost = posts[0];
 const recentPosts = posts.slice(1, 5);
-const categories = ['RPG', 'Narrativa', 'Guias', 'Lore', 'Reflexões'];
-const categorySlug = (category: string) => category.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
 ---
 
 <BaseLayout
@@ -27,24 +28,48 @@ const categorySlug = (category: string) => category.normalize('NFD').replace(/[\
 
       <!-- Seção: Destaque -->
       <section class="index-section" aria-label="História em destaque">
-        {featuredPost && <FeaturedArticle {...featuredPost.data} href={`/posts/${featuredPost.id}`} />}
+        {featuredPost && (
+          <FeaturedArticle
+            title={featuredPost.data.title}
+            description={featuredPost.data.description}
+            readTime={featuredPost.data.readTime}
+            category={featuredPost.data.category}
+            image={featuredPost.data.image}
+            href={postHref(featuredPost)}
+          />
+        )}
       </section>
 
       <!-- Seção: Últimos Textos -->
       <section class="index-section" aria-label="Últimos textos">
         <h2 class="section-title">Últimos Textos</h2>
-        <div class="articles-grid">
-          {recentPosts.map((post) => (
-            <ArticleCard {...post.data} href={`/posts/${post.id}`} />
-          ))}
-        </div>
+        {recentPosts.length > 0 ? (
+          <div class="articles-grid">
+            {recentPosts.map((post) => (
+              <ArticleCard
+                title={post.data.title}
+                description={post.data.description}
+                readTime={post.data.readTime}
+                category={post.data.category}
+                image={post.data.image}
+                href={postHref(post)}
+              />
+            ))}
+          </div>
+        ) : (
+          <p class="empty-hint">
+            {featuredPost
+              ? 'Mais textos em breve. Enquanto isso, explore o destaque acima.'
+              : 'Ainda não há textos publicados. Volte em breve.'}
+          </p>
+        )}
       </section>
 
       <!-- Seção: Categorias e Continue Explorando -->
       <section class="index-section explore-section" aria-label="Navegação de categorias">
         <h2 class="section-title">Categorias</h2>
         <ul class="categories-list" role="list">
-          {categories.map((cat) => (
+          {POST_CATEGORIES.map((cat) => (
             <li><a href={`/categorias/${categorySlug(cat)}`} class="category-link">{cat}</a></li>
           ))}
         </ul>
@@ -109,6 +134,11 @@ const categorySlug = (category: string) => category.normalize('NFD').replace(/[\
     display: grid;
     grid-template-columns: 1fr;
     gap: var(--space-8);
+  }
+
+  .empty-hint {
+    color: var(--color-ivory-muted);
+    font-size: var(--text-base);
   }
 
   /* Seção Categorias */

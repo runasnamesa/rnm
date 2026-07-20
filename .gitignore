@@ -22,3 +22,11 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# local tooling / binaries
+yt-dlp.exe
+*.exe
+
+# OS
+Thumbs.db
+Desktop.ini

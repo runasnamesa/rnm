@@ -1,49 +1,37 @@
 # Runas na Mesa
 
-Site estático em Astro. A primeira visita abre a welcome em `/`; após entrar, a taverna está em `/index`.
+Site estático em **Astro** — uma taverna digital para jogadores e mestres de RPG.
 
-Os posts usam a coleção de conteúdo em `src/content/posts/` e são publicados automaticamente em `/posts/<slug>`. Consulte [docs/POSTS.md](docs/POSTS.md) para criar um novo texto.
+- **Welcome** (primeira visita): `/`
+- **Taverna** (home do conteúdo): `/index`
+- **Posts**: `/posts/<slug>` a partir de `src/content/posts/`
 
-## Desenvolvimento
+Documentação do projeto em [`docs/`](docs/). Como criar posts: [`docs/POSTS.md`](docs/POSTS.md).
 
-```sh
-npm create astro@latest -- --template minimal
-```
-
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
-
-## 🚀 Project Structure
-
-Inside of your Astro project, you'll see the following folders and files:
+## Estrutura
 
 ```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
+src/
+├── components/     # UI (Navbar, cards, welcome…)
+├── config/         # site, navegação, content rules, welcome
+├── content/posts/  # Markdown da coleção de posts
+├── layouts/        # BaseLayout
+├── lib/            # helpers (posts, welcome)
+├── pages/          # rotas Astro
+├── styles/         # design system (global.css)
+└── utils/          # utilitários puros (path, etc.)
 ```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+## Comandos
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+| Comando            | Ação                                      |
+| :----------------- | :---------------------------------------- |
+| `npm install`      | Instala dependências                      |
+| `npm run dev`      | Dev server em `localhost:4321`            |
+| `npm run build`    | Build estático em `./dist/`               |
+| `npm run preview`  | Preview do build                          |
+| `npm run check`    | Typecheck (`astro check`)                 |
 
-Any static assets, like images, can be placed in the `public/` directory.
+## Stack
 
-## 🧞 Commands
-
-All commands are run from the root of the project, from a terminal:
-
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+Ver [docs/01-STACK.md](docs/01-STACK.md). Em resumo: Astro, GitHub, Vercel, Cloudflare.

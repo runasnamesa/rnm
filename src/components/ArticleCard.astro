@@ -4,14 +4,14 @@
  */
 interface Props {
   title: string;
-  excerpt: string;
+  description: string;
   readTime: string;
   category: string;
   image: string;
   href: string;
 }
 
-const { title, excerpt, readTime, category, image, href } = Astro.props;
+const { title, description, readTime, category, image, href } = Astro.props;
 ---
 
 <article class="article-card">
@@ -26,7 +26,7 @@ const { title, excerpt, readTime, category, image, href } = Astro.props;
       </div>
       
       <h3 class="article-card__title">{title}</h3>
-      <p class="article-card__excerpt">{excerpt}</p>
+      <p class="article-card__excerpt">{description}</p>
     </div>
   </a>
 </article>

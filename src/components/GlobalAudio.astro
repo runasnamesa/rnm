@@ -9,6 +9,7 @@ import { WELCOME_CONFIG } from "../config/welcome.config";
   preload="auto"
   playsinline
   transition:persist="ambient-audio"
+  data-volume={String(WELCOME_CONFIG.audio.volume)}
 >
   <source src={WELCOME_CONFIG.audio.src} type="audio/mp4" />
 </audio>
@@ -29,8 +30,11 @@ import { WELCOME_CONFIG } from "../config/welcome.config";
         const savedVolume = localStorage.getItem("rnm_audio_volume");
         const savedPlaying = localStorage.getItem("rnm_audio_playing");
 
-        // Volume inicial de 20% conforme pedido (0.2), ou o salvo
-        audioEl.volume = savedVolume ? parseFloat(savedVolume) : 0.25;
+        // Volume inicial da config, ou o valor salvo pelo usuário
+        const defaultVolume = Number(
+          document.getElementById('global-ambient-audio')?.dataset.volume ?? '0.25',
+        );
+        audioEl.volume = savedVolume ? parseFloat(savedVolume) : defaultVolume;
 
         // Tenta tocar se for a primeira visita ou se o usuário deixou ativado
         if (savedPlaying === "true" || savedPlaying === null) {
