@@ -1,0 +1,43 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { readStoredContent } from '../lib/admin';
+
+const content = await readStoredContent();
+---
+
+<BaseLayout title="Texto do Mestre — Runas na Mesa" description="Texto público carregado pelo fluxo do Mestre.">
+  <section class="page container publisher-shell">
+    <article class="publisher-card">
+      <h1>Texto do Mestre</h1>
+      <div class="publisher-content">
+        <Fragment set:html={content} />
+      </div>
+    </article>
+  </section>
+</BaseLayout>
+
+<style>
+  .publisher-shell {
+    padding-block: var(--space-16);
+  }
+
+  .publisher-card {
+    max-width: 900px;
+    margin: 0 auto;
+    background: var(--surface-tavern);
+    border: 1px solid rgba(255, 214, 122, 0.22);
+    border-radius: 24px;
+    padding: var(--space-8);
+  }
+
+  .publisher-card h1 {
+    font-family: var(--font-display);
+    color: var(--color-starlight-gold);
+    margin-bottom: var(--space-4);
+  }
+
+  .publisher-content {
+    color: var(--color-ivory);
+    line-height: 1.8;
+  }
+</style>

@@ -64,11 +64,15 @@ const currentYear = new Date().getFullYear();
 
   <!-- Copyright -->
   <div class="footer__bottom container">
-    <p class="footer__copyright">
-      &copy; {currentYear} {SITE.name}. Feito com
-      <span class="footer__heart" aria-label="amor">&#9830;</span>
-      para aventureiros.
-    </p>
+    <div class="footer__bottom-row">
+      <p class="footer__copyright">
+        &copy; {currentYear} {SITE.name}. Feito com
+        <span class="footer__heart" aria-label="amor">&#9830;</span>
+        para aventureiros.
+      </p>
+
+      <a href="/admin" class="footer__mestre-toggle">Mestre</a>
+    </div>
   </div>
 </footer>
 
@@ -194,6 +198,13 @@ const currentYear = new Date().getFullYear();
     padding-block: var(--space-6);
   }
 
+  .footer__bottom-row {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
   .footer__copyright {
     font-size: var(--text-xs);
     color: var(--color-ivory-subtle);
@@ -205,6 +216,26 @@ const currentYear = new Date().getFullYear();
     color: var(--color-starlight-gold);
     font-size: 0.7em;
   }
+
+  .footer__mestre-toggle {
+    border: 1px solid color-mix(in srgb, var(--color-starlight-gold) 50%, transparent);
+    background: transparent;
+    color: var(--color-ivory-muted);
+    font-size: var(--text-xs);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.45rem 0.8rem;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: color var(--transition-fast), border-color var(--transition-fast), background var(--transition-fast);
+  }
+
+  .footer__mestre-toggle:hover {
+    color: var(--color-starlight-gold);
+    border-color: var(--color-starlight-gold);
+    background: rgba(255, 214, 122, 0.06);
+  }
+
 
   /* Tablet */
   @media (min-width: 640px) {

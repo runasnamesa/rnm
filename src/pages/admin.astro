@@ -1,0 +1,135 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { ADMIN_COOKIE_NAME, ADMIN_COOKIE_VALUE, readStoredContent, isAuthenticatedCookie } from '../lib/admin';
+
+const cookie = Astro.cookies;
+const isAuthenticated = isAuthenticatedCookie(cookie);
+const initialContent = await readStoredContent();
+
+const status = Astro.url.searchParams.get('status') ?? '';
+---
+
+<BaseLayout title="Admin — Runas na Mesa" description="Painel administrativo do mestre para escrever e publicar conteúdo.">
+  <section class="page container admin-shell">
+    <div class="admin-card">
+      <h1>Área do Mestre</h1>
+      <p class="admin-subtitle">Painel administrativo para escrita privada do usuário mestre.</p>
+
+      {isAuthenticated ? (
+        <div class="admin-editor">
+          <div class="admin-actions">
+            <form method="POST" action="/api/admin/logout">
+              <button type="submit" class="admin-ghost">Sair</button>
+            </form>
+            <form method="POST" action="/api/admin/save">
+              <textarea name="content" rows="18" spellcheck="false">{initialContent}</textarea>
+              <button type="submit" class="admin-submit">Salvar conteúdo</button>
+            </form>
+          </div>
+
+          {status === 'saved' && <p class="admin-message">Texto salvo com sucesso.</p>}
+        </div>
+      ) : (
+        <form method="POST" action="/api/admin/login" class="admin-form">
+          <label>
+            <span>Usuário</span>
+            <input name="username" type="text" autocomplete="username" required />
+          </label>
+          <label>
+            <span>Senha</span>
+            <input name="password" type="password" autocomplete="current-password" required />
+          </label>
+          <button type="submit" class="admin-submit">Entrar</button>
+        </form>
+      )}
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .admin-shell {
+    padding-block: var(--space-16);
+  }
+
+  .admin-card {
+    max-width: 860px;
+    margin: 0 auto;
+    background: var(--surface-tavern);
+    border: 1px solid rgba(255, 214, 122, 0.22);
+    border-radius: 24px;
+    padding: var(--space-8);
+  }
+
+  .admin-card h1 {
+    font-family: var(--font-display);
+    color: var(--color-starlight-gold);
+    margin-bottom: var(--space-2);
+  }
+
+  .admin-subtitle {
+    color: var(--color-ivory-muted);
+    margin-bottom: var(--space-6);
+  }
+
+  .admin-form,
+  .admin-editor {
+    display: grid;
+    gap: var(--space-5);
+  }
+
+  .admin-form label,
+  .admin-editor label {
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .admin-form span {
+    color: var(--color-ivory);
+  }
+
+  .admin-form input,
+  .admin-editor textarea {
+    width: 100%;
+    border: 1px solid rgba(255, 214, 122, 0.26);
+    background: rgba(12, 15, 23, 0.9);
+    color: var(--color-ivory);
+    border-radius: 14px;
+    padding: 0.9rem 1rem;
+    font: inherit;
+  }
+
+  .admin-editor textarea {
+    min-height: 360px;
+    resize: vertical;
+  }
+
+  .admin-actions {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  .admin-submit,
+  .admin-ghost {
+    cursor: pointer;
+    border-radius: 999px;
+    padding: 0.7rem 1.1rem;
+    font: inherit;
+  }
+
+  .admin-submit {
+    border: 1px solid var(--color-starlight-gold);
+    background: var(--color-starlight-gold);
+    color: #111;
+    font-weight: var(--weight-semibold);
+  }
+
+  .admin-ghost {
+    border: 1px solid rgba(255, 214, 122, 0.38);
+    background: transparent;
+    color: var(--color-ivory-muted);
+  }
+
+  .admin-message {
+    color: #d6ffb8;
+  }
+</style>
