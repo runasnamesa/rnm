@@ -6,5 +6,6 @@ import node from '@astrojs/node';
 export default defineConfig({
   site: 'https://runasnamesa.com.br',
   trailingSlash: 'ignore',
+  output: 'server',
   adapter: node({ mode: 'standalone' }),
 });

@@ -1,5 +1,7 @@
+export const prerender = false;
+
 import type { APIRoute } from 'astro';
-import { ADMIN_COOKIE_NAME, isAuthenticatedCookie, writeStoredContent } from '../../../lib/admin';
+import { isAuthenticatedCookie, writeStoredContent } from '../../../lib/admin';
 
 export const POST: APIRoute = async ({ request, cookies, redirect }) => {
   if (!isAuthenticatedCookie(cookies)) {

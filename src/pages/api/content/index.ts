@@ -1,3 +1,5 @@
+export const prerender = false;
+
 import type { APIRoute } from 'astro';
 import { readStoredContent } from '../../../lib/admin';
 

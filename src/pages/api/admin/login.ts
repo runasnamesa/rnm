@@ -1,3 +1,5 @@
+export const prerender = false;
+
 import type { APIRoute } from 'astro';
 import { ADMIN_COOKIE_NAME, ADMIN_COOKIE_VALUE, verifyMasterLogin } from '../../../lib/admin';
 

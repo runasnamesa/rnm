@@ -1,6 +1,8 @@
 ---
+export const prerender = false;
+
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { ADMIN_COOKIE_NAME, ADMIN_COOKIE_VALUE, readStoredContent, isAuthenticatedCookie } from '../lib/admin';
+import { readStoredContent, isAuthenticatedCookie } from '../lib/admin';
 
 const cookie = Astro.cookies;
 const isAuthenticated = isAuthenticatedCookie(cookie);
