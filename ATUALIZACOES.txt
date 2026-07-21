@@ -1,0 +1,11 @@
+Runas na Mesa - Log de Atualizações
+==================================
+
+Data: 2026-07-21
+
+- Base de servidor Astro/Node preparada para uso oficial.
+- Botão discreto do mestre adicionado no rodapé.
+- Painel administrativo /admin preparado para login exclusivo do usuário Magnus.
+- API de conteúdo preparada para receber texto do fluxo automatizado do N8N sem quebrar o fluxo público atual.
+- Página pública /texto-mestre criada para expor o conteúdo do mestre.
+- Arquivo de log criado para rastrear e validar o estado dos pushes.
