@@ -7,7 +7,7 @@ export const WELCOME_CONFIG = {
     // Caminho para o arquivo de áudio
     src: '/audio/tavern-ambient.m4a',
     // Volume inicial (0.0 a 1.0)
-    volume: 0.25,
+    volume: 0.35,
     // Tenta tocar automaticamente (sujeito às políticas do navegador)
     autoplay: true,
   },
@@ -21,11 +21,15 @@ export const WELCOME_CONFIG = {
   // Configurações do sistema de partículas (neve)
   particles: {
     // Quantidade de flocos na tela (menos = mais leve)
-    count: 120,
+    count: 320,
     // Tamanho base dos flocos
     size: 2,
     // Multiplicador de velocidade de queda
-    speed: 0.5,
+    speed: 1.05,
+    // Intensidade do vento lateral em rajadas
+    wind: 1.6,
+    // Frequência da variação de vento
+    gust: 1.35,
   },
   
   // Textos da interface
