@@ -1,7 +1,7 @@
 Runas na Mesa - Log de Atualizações
 ==================================
 
-Data: 2026-07-21
+Data: 2026-07-21 - MOB
 
 - Base de servidor Astro/Node preparada para uso oficial.
 - Botão discreto do mestre adicionado no rodapé.
@@ -9,3 +9,16 @@ Data: 2026-07-21
 - API de conteúdo preparada para receber texto do fluxo automatizado do N8N sem quebrar o fluxo público atual.
 - Página pública /texto-mestre criada para expor o conteúdo do mestre.
 - Arquivo de log criado para rastrear e validar o estado dos pushes.
+- Áudio ambiente tornado global entre as navegações, preservando reprodução, volume e posição da faixa.
+- Retorno para a Welcome Screen adicionado ao header, com seta discreta e limpeza do cookie de introdução.
+- Welcome Screen corrigida para inicializar corretamente a neve e os controles de entrada após o carregamento.
+- Header reorganizado em largura total, sem comprimir a logo ou a navegação.
+- Botão "Mestre" reduzido e reposicionado no canto inferior direito do footer.
+- Painel administrativo refeito como dashboard completo, com sidebar, visão geral, métricas, atividade recente, atalhos e editor de publicação.
+- Tela de login do administrador separada do layout público, com estado de erro e acesso responsivo em dispositivos móveis.
+- Texto do Mestre convertido em publicação editorial, com título, descrição, categoria, data, metadados e layout de post.
+- Editor administrativo ampliado para salvar os metadados da publicação junto com o conteúdo HTML.
+- CSS do dashboard administrativo restaurado após correção de renderização sem estilos; layout, sidebar, cards, editor e responsividade normalizados.
+- Post persistido do Mestre integrado ao destaque da tela inicial, com os posts Markdown mantidos na grade de textos recentes.
+- Conteúdo do Mestre convertido em coleção de posts independentes, com criação por id, edição individual e migração compatível do registro antigo.
+- Cada novo post ganhou rota pública própria, presença na home e entrada no Arquivo.

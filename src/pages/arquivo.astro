@@ -1,16 +1,25 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getPublishedPosts, postHref } from '../lib/posts';
+import { readStoredPosts } from '../lib/admin';
 
 const posts = await getPublishedPosts();
+const masterPosts = await readStoredPosts();
 ---
 
 <BaseLayout title="Arquivo — Runas na Mesa" description="Todos os textos da Runas na Mesa.">
   <section class="archive container">
     <p class="eyebrow">Arquivo</p>
     <h1>Todos os textos</h1>
-    {posts.length > 0 ? (
+    {masterPosts.length > 0 || posts.length > 0 ? (
       <div class="archive__list">
+        {masterPosts.map((post) => (
+          <a href={`/texto-mestre/${post.id}`} class="archive__item">
+            <span>{post.category}</span>
+            <strong>{post.title}</strong>
+            <small>{post.description}</small>
+          </a>
+        ))}
         {posts.map((post) => (
           <a href={postHref(post)} class="archive__item">
             <span>{post.data.category}</span>

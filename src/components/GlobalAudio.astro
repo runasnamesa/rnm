@@ -15,8 +15,9 @@ import { WELCOME_CONFIG } from "../config/welcome.config";
 </audio>
 
 <script>
-  // Script leve apenas para restaurar o estado na primeira carga da página.
-  // Graças ao transition:persist, esse elemento se mantém vivo durante a navegação.
+  const AUDIO_POSITION_KEY = "rnm_audio_position";
+
+  // O elemento é preservado pelo View Transitions; o estado salvo cobre remontagens completas.
   const initializeAudio = () => {
       const audioEl = document.getElementById(
         "global-ambient-audio",
@@ -29,12 +30,28 @@ import { WELCOME_CONFIG } from "../config/welcome.config";
 
         const savedVolume = localStorage.getItem("rnm_audio_volume");
         const savedPlaying = localStorage.getItem("rnm_audio_playing");
+        const savedPosition = sessionStorage.getItem(AUDIO_POSITION_KEY);
 
         // Volume inicial da config, ou o valor salvo pelo usuário
         const defaultVolume = Number(
           document.getElementById('global-ambient-audio')?.dataset.volume ?? '0.25',
         );
         audioEl.volume = savedVolume ? parseFloat(savedVolume) : defaultVolume;
+
+        if (savedPosition) {
+          const restorePosition = () => {
+            const position = parseFloat(savedPosition);
+            if (Number.isFinite(position) && position < audioEl.duration) {
+              audioEl.currentTime = position;
+            }
+          };
+
+          if (audioEl.readyState >= 1) {
+            restorePosition();
+          } else {
+            audioEl.addEventListener('loadedmetadata', restorePosition, { once: true });
+          }
+        }
 
         // Tenta tocar se for a primeira visita ou se o usuário deixou ativado
         if (savedPlaying === "true" || savedPlaying === null) {
@@ -66,6 +83,11 @@ import { WELCOME_CONFIG } from "../config/welcome.config";
         }
       }
   };
+
+  const audioEl = document.getElementById("global-ambient-audio") as HTMLAudioElement | null;
+  audioEl?.addEventListener('timeupdate', () => {
+    sessionStorage.setItem(AUDIO_POSITION_KEY, String(audioEl.currentTime));
+  });
 
   initializeAudio();
   document.addEventListener('DOMContentLoaded', initializeAudio);

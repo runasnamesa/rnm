@@ -8,7 +8,7 @@ interface Props {
   description: string;
   readTime: string;
   category: string;
-  image: string;
+  image?: string;
   href: string;
 }
 
@@ -17,11 +17,11 @@ const { title, description, readTime, category, image, href } = Astro.props;
 
 <article class="featured-article">
   <a href={href} class="featured-article__link-wrapper" aria-label={`Ler a história: ${title}`}>
-    <div class="featured-article__image-container">
+    {image && <div class="featured-article__image-container">
       <!-- Usando div com background temporariamente para mock. No futuro, usar <Image /> do Astro -->
       <div class="featured-article__image" style={`background-image: url('${image}')`}></div>
       <div class="featured-article__overlay"></div>
-    </div>
+    </div>}
     
     <div class="featured-article__content">
       <div class="featured-article__meta">

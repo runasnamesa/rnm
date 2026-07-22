@@ -1,10 +1,16 @@
 ---
 export const prerender = false;
 
-import BaseLayout from '../layouts/BaseLayout.astro';
-import { readStoredPost } from '../lib/admin';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { readStoredPosts } from '../../lib/admin';
 
-const post = await readStoredPost();
+const posts = await readStoredPosts();
+const post = posts.find((item) => item.id === Astro.params.slug);
+
+if (!post) {
+  return new Response(null, { status: 404, statusText: 'Not found' });
+}
+
 const formattedDate = new Intl.DateTimeFormat('pt-BR', {
   day: '2-digit',
   month: 'long',

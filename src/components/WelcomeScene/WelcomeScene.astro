@@ -169,7 +169,7 @@ import { WELCOME_CONFIG } from '../../config/welcome.config';
 <script>
   import { setWelcomeSeenCookie } from '../../lib/welcome';
 
-  document.addEventListener('DOMContentLoaded', () => {
+  const initializeWelcomeScene = () => {
     const enterBtn = document.getElementById('enter-button');
     const skipBtn = document.getElementById('skip-btn');
     const scene = document.getElementById('welcome-scene');
@@ -283,5 +283,11 @@ import { WELCOME_CONFIG } from '../../config/welcome.config';
         setTimeout(() => { window.location.assign('/index'); }, 300);
       });
     }
-  });
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeWelcomeScene, { once: true });
+  } else {
+    initializeWelcomeScene();
+  }
 </script>

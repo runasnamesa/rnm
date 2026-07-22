@@ -27,7 +27,7 @@ const { count = 100, speed = 1 } = Astro.props;
 </style>
 
 <script>
-  document.addEventListener('DOMContentLoaded', () => {
+  const initializeSnow = () => {
     const canvas = document.getElementById('snow-canvas') as HTMLCanvasElement;
     if (!canvas) return;
 
@@ -146,5 +146,11 @@ const { count = 100, speed = 1 } = Astro.props;
     // Inicia
     init();
     render();
-  });
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeSnow, { once: true });
+  } else {
+    initializeSnow();
+  }
 </script>

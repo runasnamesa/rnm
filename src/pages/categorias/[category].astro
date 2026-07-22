@@ -7,6 +7,7 @@ import {
   postHref,
   type PostCategory,
 } from '../../lib/posts';
+import { readStoredPosts } from '../../lib/admin';
 
 export async function getStaticPaths() {
   // Always emit every known category so home links never 404.
@@ -18,14 +19,23 @@ export async function getStaticPaths() {
 
 const { category } = Astro.props as { category: PostCategory };
 const posts = await getPostsByCategory(category);
+const masterPosts = (await readStoredPosts()).filter((post) => post.category === category);
 ---
 
 <BaseLayout title={`${category} — Runas na Mesa`} description={`Textos da categoria ${category}.`}>
   <section class="category container">
     <a href="/arquivo">← Arquivo completo</a>
     <h1>{category}</h1>
-    {posts.length > 0 ? (
+    {masterPosts.length > 0 || posts.length > 0 ? (
       <ul>
+        {masterPosts.map((post) => (
+          <li>
+            <a href={`/texto-mestre/${post.id}`}>
+              {post.title}
+              <span>{post.description}</span>
+            </a>
+          </li>
+        ))}
         {posts.map((post) => (
           <li>
             <a href={postHref(post)}>

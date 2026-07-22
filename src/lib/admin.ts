@@ -11,6 +11,25 @@ const DEFAULT_CONTENT = `
 <p>Escreva seu texto aqui.</p>
 `;
 
+export interface MasterPost {
+  id: string;
+  content: string;
+  title: string;
+  description: string;
+  category: string;
+  pubDate: string;
+  readTime: string;
+}
+
+const DEFAULT_POST: Omit<MasterPost, 'content'> = {
+  id: 'mestre-inicial',
+  title: 'Texto do Mestre',
+  description: 'Uma nova mensagem foi deixada sobre a mesa da taverna.',
+  category: 'Narrativa',
+  pubDate: new Date().toISOString().slice(0, 10),
+  readTime: 'Leitura do Mestre',
+};
+
 async function ensureStorage() {
   await fs.mkdir(path.dirname(ADMIN_DATA_PATH), { recursive: true });
 
@@ -25,23 +44,82 @@ async function ensureStorage() {
   }
 }
 
+function makePostId(title: string) {
+  const slug = title
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '')
+    .slice(0, 60);
+
+  return `${slug || 'post'}-${Date.now().toString(36)}`;
+}
+
 export async function readStoredContent() {
-  await ensureStorage();
-
-  const raw = await fs.readFile(ADMIN_DATA_PATH, 'utf8');
-  const parsed = JSON.parse(raw) as { content?: string };
-
-  return parsed.content ?? DEFAULT_CONTENT;
+  return (await readStoredPost()).content;
 }
 
 export async function writeStoredContent(content: string) {
+  const current = await readStoredPost();
+  await writeStoredPost({ ...current, content });
+}
+
+export async function readStoredPosts(): Promise<MasterPost[]> {
   await ensureStorage();
 
-  await fs.writeFile(
-    ADMIN_DATA_PATH,
-    JSON.stringify({ content }, null, 2),
-    'utf8',
-  );
+  const raw = await fs.readFile(ADMIN_DATA_PATH, 'utf8');
+  const parsed = JSON.parse(raw) as Partial<MasterPost> | MasterPost[];
+  const posts = Array.isArray(parsed) ? parsed : [parsed];
+
+  return posts.map((post, index) => ({
+    ...DEFAULT_POST,
+    ...post,
+    id: post.id ?? (index === 0 ? DEFAULT_POST.id : makePostId(post.title ?? 'post')),
+    content: post.content ?? DEFAULT_CONTENT,
+  }));
+}
+
+export async function readStoredPost(id?: string): Promise<MasterPost> {
+  const posts = await readStoredPosts();
+  return posts.find((post) => post.id === id) ?? posts[0];
+}
+
+export async function writeStoredPosts(posts: MasterPost[]) {
+  await ensureStorage();
+
+  await fs.writeFile(ADMIN_DATA_PATH, JSON.stringify(posts, null, 2), 'utf8');
+}
+
+export async function writeStoredPost(post: MasterPost) {
+  const posts = await readStoredPosts();
+  const index = posts.findIndex((item) => item.id === post.id);
+
+  if (index === -1) {
+    posts.unshift(post);
+  } else {
+    posts[index] = post;
+  }
+
+  await writeStoredPosts(posts);
+}
+
+export async function createStoredPost(input: Omit<MasterPost, 'id'>) {
+  const post = { ...input, id: makePostId(input.title) };
+  await writeStoredPost(post);
+  return post;
+}
+
+export async function deleteStoredPost(id: string) {
+  const posts = await readStoredPosts();
+  const remainingPosts = posts.filter((post) => post.id !== id);
+
+  if (remainingPosts.length === posts.length) {
+    return false;
+  }
+
+  await writeStoredPosts(remainingPosts);
+  return true;
 }
 
 export function verifyMasterLogin(username: string, password: string) {

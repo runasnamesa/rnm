@@ -16,7 +16,19 @@ const currentPath = Astro.url.pathname;
 ---
 
 <header class="navbar" id="navbar">
-  <div class="navbar__inner container">
+  <div class="navbar__inner">
+    <a
+      href="/"
+      class="navbar__welcome-link"
+      aria-label="Voltar para a tela de boas-vindas"
+      title="Voltar para a tela de boas-vindas"
+      data-welcome-return
+    >
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M19 12H5M11 18l-6-6 6-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+    </a>
+
     <!-- Logo -->
     <a href="/index" class="navbar__logo" aria-label={`${SITE.name} — Página inicial`}>
       <!-- Ícone de runa estilizada -->
@@ -122,8 +134,36 @@ const currentPath = Astro.url.pathname;
   .navbar__inner {
     display: flex;
     align-items: center;
-    justify-content: space-between;
     height: 4.5rem;
+    width: 100%;
+    padding-inline: var(--space-6);
+  }
+
+  .navbar__welcome-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    margin-right: var(--space-8);
+    color: var(--color-ivory-subtle);
+    border-radius: var(--radius-full);
+    transition: color var(--transition-fast), background var(--transition-fast);
+  }
+
+  .navbar__welcome-link:hover,
+  .navbar__welcome-link:focus-visible {
+    color: var(--color-ivory);
+    background: var(--color-ivory-ghost);
+  }
+
+  .navbar__welcome-link:hover {
+    transform: translateX(-1px);
+  }
+
+  .navbar__welcome-link:focus-visible {
+    outline: 1px solid var(--color-starlight-gold);
+    outline-offset: 2px;
   }
 
   /* Logo */
@@ -155,6 +195,7 @@ const currentPath = Astro.url.pathname;
     display: flex;
     align-items: center;
     gap: var(--space-4);
+    margin-left: auto;
   }
 
   /* Navegação Desktop */
@@ -300,6 +341,11 @@ const currentPath = Astro.url.pathname;
   // Toggle menu mobile
   const toggle = document.getElementById('navbar-toggle');
   const menu = document.getElementById('mobile-menu');
+  const welcomeReturn = document.querySelector('[data-welcome-return]');
+
+  welcomeReturn?.addEventListener('click', () => {
+    document.cookie = 'rnm_welcome_last_seen=; max-age=0; path=/; SameSite=Lax';
+  });
 
   if (toggle && menu) {
     toggle.addEventListener('click', () => {
