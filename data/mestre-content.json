@@ -1,1 +1,11 @@
-[]
+[
+  {
+    "id": "boas-vindas-a-tavera",
+    "title": "Boas-vindas à Taverna",
+    "description": "Uma caneca quente e uma boa história. É tudo que um aventureiro precisa.",
+    "content": "<p>Sentem-se, aventureiros. A tempestade lá fora é impiedosa, mas aqui dentro o fogo está aceso, a caneca está cheia, e as histórias estão prestes a começar.</p><p>Runas na Mesa é mais que um blog — é um refúgio. Um lugar para encontrar paz entre uma rolagem de dados e outra, para descobrir ideias que vão iluminar sua próxima campanha, e para sentir que, mesmo no caos do dia a dia, sempre há uma taverna esperando por você.</p><p>Explore os textos, deixe suas runas sobre a mesa, e lembre-se: toda grande jornada começa com um passo — ou uma caneca.</p><p><strong>— Magnus, o Taverneiro.</strong><br><em>A história começa na primeira caneca.</em></p>",
+    "category": "Narrativa",
+    "pubDate": "2026-07-22",
+    "readTime": "Leitura do Mestre"
+  }
+]

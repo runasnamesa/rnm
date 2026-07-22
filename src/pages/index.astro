@@ -1,8 +1,18 @@
 ---
-import { ClientRouter } from 'astro:transitions';
+/**
+ * Runas na Mesa — Entrada.
+ *
+ * Não é uma landing page comercial.
+ * Não é um portal.
+ * Não tem botões, menus, links ou chamadas para ação.
+ *
+ * É uma experiência narrativa:
+ *   TEMPESTADE → LUZ → PORTA → ABERTURA → TAVERNA → BLOG
+ *
+ * O usuário não "acessa um site".
+ * Ele "encontra uma porta no meio da tempestade".
+ */
 import WelcomeScene from '../components/WelcomeScene/WelcomeScene.astro';
-import GlobalAudio from '../components/GlobalAudio.astro';
-import '../styles/global.css';
 ---
 
 <!DOCTYPE html>
@@ -10,48 +20,25 @@ import '../styles/global.css';
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Runas na Mesa — Boas-vindas</title>
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="icon" href="/favicon.ico" />
+    <title>Runas na Mesa</title>
     <meta name="robots" content="noindex, nofollow" />
 
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Montserrat:wght@400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
-    <ClientRouter />
     <style>
-      /* Reset específico para a Welcome */
-      html, body {
+      /* Reset absoluto */
+      *, *::before, *::after {
         margin: 0;
         padding: 0;
-        width: 100%;
-        height: 100vh;
-        overflow: hidden;
-        background-color: var(--color-deep-space);
-        color: var(--color-ivory);
+        box-sizing: border-box;
       }
-      /* Transição de saída suave caso o ViewTransitions não seja usado */
-      .fade-out {
-        opacity: 0 !important;
-        transition: opacity 800ms ease-in-out;
+      html, body {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: #060B17;
       }
     </style>
   </head>
   <body>
-    <!-- Áudio global com persistência -->
-    <GlobalAudio />
     <WelcomeScene />
-
-    <!-- Cookie de boas-vindas: pula a intro se ainda estiver válida -->
-    <script>
-      import { shouldSkipWelcome } from '../lib/welcome';
-      if (shouldSkipWelcome()) {
-        window.location.replace('/index');
-      }
-    </script>
   </body>
 </html>

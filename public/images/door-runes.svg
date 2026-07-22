@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 500" fill="none">
+  <!-- Door frame -->
+  <rect x="5" y="5" width="190" height="490" rx="8" stroke="#D4B06A" stroke-width="3" fill="none" opacity="0.6"/>
+  <rect x="12" y="12" width="176" height="476" rx="5" stroke="#D4B06A" stroke-width="1" fill="none" opacity="0.3"/>
+  
+  <!-- Door panels -->
+  <rect x="25" y="60" width="150" height="180" rx="4" stroke="#D4B06A" stroke-width="1" fill="none" opacity="0.2"/>
+  <rect x="25" y="260" width="150" height="180" rx="4" stroke="#D4B06A" stroke-width="1" fill="none" opacity="0.2"/>
+  
+  <!-- Rune 1 (top center) - Protection -->
+  <g opacity="0.7" transform="translate(100,100)">
+    <path d="M0-25 L10-10 L0 5 L-10-10 Z" stroke="#F0D79A" stroke-width="1.5" fill="none"/>
+    <circle cx="0" cy="-5" r="3" fill="#F0D79A" opacity="0.5"/>
+  </g>
+  
+  <!-- Rune 2 (top right) - Journey -->
+  <g opacity="0.6" transform="translate(145,150)">
+    <path d="M-8-15 L8-15 L0 10 Z" stroke="#F0D79A" stroke-width="1.5" fill="none"/>
+    <path d="M0-15 L0 10" stroke="#F0D79A" stroke-width="1"/>
+  </g>
+  
+  <!-- Rune 3 (center) - Wisdom -->
+  <g opacity="0.8" transform="translate(100,210)">
+    <circle cx="0" cy="0" r="12" stroke="#F0D79A" stroke-width="1.5" fill="none"/>
+    <path d="M-6-6 L6 6 M-6 6 L6-6" stroke="#F0D79A" stroke-width="1.5"/>
+  </g>
+  
+  <!-- Rune 4 (bottom left) - Strength -->
+  <g opacity="0.5" transform="translate(55,350)">
+    <path d="M0-18 L12 6 L-12 6 Z" stroke="#F0D79A" stroke-width="1.5" fill="none"/>
+    <path d="M0-18 L0 6" stroke="#F0D79A" stroke-width="1"/>
+  </g>
+  
+  <!-- Rune 5 (bottom right) - Welcome -->
+  <g opacity="0.6" transform="translate(145,370)">
+    <path d="M-8-12 L0 0 L8-12" stroke="#F0D79A" stroke-width="1.5" fill="none"/>
+    <path d="M-10 4 L0-4 L10 4" stroke="#F0D79A" stroke-width="1.5" fill="none"/>
+  </g>
+  
+  <!-- Door handle -->
+  <circle cx="155" cy="250" r="8" stroke="#D4B06A" stroke-width="2" fill="none" opacity="0.8"/>
+  <circle cx="155" cy="250" r="4" fill="#D4B06A" opacity="0.4"/>
+  
+  <!-- Light leak from bottom -->
+  <line x1="70" y1="488" x2="130" y2="488" stroke="#F0D79A" stroke-width="2" opacity="0.15"/>
+</svg>

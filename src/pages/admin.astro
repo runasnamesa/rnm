@@ -2,14 +2,20 @@
 export const prerender = false;
 
 import { readStoredPosts, isAuthenticatedCookie } from '../lib/admin';
+import { readTasks } from '../lib/tasks';
 
 const isAuthenticated = isAuthenticatedCookie(Astro.cookies);
 const posts = isAuthenticated ? await readStoredPosts() : [];
+const tasks = isAuthenticated ? (await readTasks()).sort((a, b) => new Date(b.createdAt).valueOf() - new Date(a.createdAt).valueOf()) : [];
 const editId = Astro.url.searchParams.get('edit') ?? '';
 const initialPost = posts.find((post) => post.id === editId) ?? null;
 const initialContent = initialPost?.content ?? '';
 const status = Astro.url.searchParams.get('status') ?? '';
 const contentLength = initialContent.replace(/<[^>]*>/g, '').trim().length;
+
+const pendingTasks = tasks.filter(t => t.status === 'pending' || t.status === 'in_progress').length;
+const doneTasks = tasks.filter(t => t.status === 'done').length;
+const today = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
 ---
 
 {isAuthenticated ? (
@@ -19,6 +25,7 @@ const contentLength = initialContent.replace(/<[^>]*>/g, '').trim().length;
       <meta name="viewport" content="width=device-width, initial-scale=1" />
       <title>Painel do Mestre — Runas na Mesa</title>
       <meta name="robots" content="noindex, nofollow" />
+      <link rel="stylesheet" href="/admin.css" />
     </head>
     <body class="admin-body">
       <div class="admin-app">
@@ -43,20 +50,19 @@ const contentLength = initialContent.replace(/<[^>]*>/g, '').trim().length;
               <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" /></svg>
               Visão geral
             </a>
+            <a class="admin-nav__link" href="#tasks">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 11l3 3L22 4" /><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" /></svg>
+              Tarefas
+              {pendingTasks > 0 && <span class="admin-nav__badge">{pendingTasks}</span>}
+            </a>
             <a class="admin-nav__link" href="#editor">
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z" /></svg>
               Texto do Mestre
-              <span class="admin-nav__badge">1</span>
+              <span class="admin-nav__badge">{posts.length}</span>
             </a>
             <a class="admin-nav__link" href="#content">
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5Z" /><path d="M4 5.5v15A2.5 2.5 0 0 1 6.5 18H20" /></svg>
-              Conteúdo
-            </a>
-
-            <span class="admin-nav__label">Configuração</span>
-            <a class="admin-nav__link" href="#settings">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-1.4 1.4-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6v.2h-2v-.2a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1L9 17l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.6-1H7v-2h.8a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9L9 9l1.4-1.4.1.1a1.7 1.7 0 0 0 1.9.3 1.7 1.7 0 0 0 1-1.6v-.2h2v.2a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1L20 9l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.2v2h-.2a1.7 1.7 0 0 0-1.8 1Z" /></svg>
-              Configurações
+              Arquivo
             </a>
           </nav>
 
@@ -74,7 +80,14 @@ const contentLength = initialContent.replace(/<[^>]*>/g, '').trim().length;
           </header>
 
           <div class="admin-content">
-            <section class="admin-heading" id="overview"><div><p class="admin-eyebrow">Terça-feira, 21 de julho de 2026</p><h1>Bom retorno, Magnus.</h1><p class="admin-lead">Aqui está o estado atual da sua taverna.</p></div><a class="admin-primary-link" href="#editor"><span>+</span> Novo conteúdo</a></section>
+            <section class="admin-heading" id="overview">
+              <div>
+                <p class="admin-eyebrow">{today}</p>
+                <h1>Bom retorno, Magnus.</h1>
+                <p class="admin-lead">{pendingTasks} tarefa(s) pendente(s) — {posts.length} post(s) publicado(s).</p>
+              </div>
+              <a class="admin-primary-link" href="#editor"><span>+</span> Novo conteúdo</a>
+            </section>
 
             {status === 'saved' && <div class="admin-alert admin-alert--success"><span>✓</span> Post atualizado e publicação atualizada com sucesso.</div>}
             {status === 'created' && <div class="admin-alert admin-alert--success"><span>✓</span> Novo post criado e publicado com sucesso.</div>}
@@ -82,89 +95,316 @@ const contentLength = initialContent.replace(/<[^>]*>/g, '').trim().length;
             {status === 'invalid' && <div class="admin-alert admin-alert--error"><span>!</span> Usuário ou senha inválidos.</div>}
 
             <section class="admin-stats" aria-label="Resumo do painel">
-              <article class="admin-stat"><div class="admin-stat__icon admin-stat__icon--gold">✦</div><div><span>Conteúdos publicados</span><strong>{posts.length}</strong><small>Posts independentes</small></div></article>
-              <article class="admin-stat"><div class="admin-stat__icon admin-stat__icon--green">✓</div><div><span>Status da publicação</span><strong>Ativo</strong><small>Visível para visitantes</small></div></article>
-              <article class="admin-stat"><div class="admin-stat__icon admin-stat__icon--blue">◷</div><div><span>Última atualização</span><strong>Agora</strong><small>Sincronização local</small></div></article>
-              <article class="admin-stat"><div class="admin-stat__icon admin-stat__icon--rose">⌁</div><div><span>Caracteres escritos</span><strong>{contentLength.toLocaleString('pt-BR')}</strong><small>No texto atual</small></div></article>
+              <article class="admin-stat">
+                <div class="admin-stat__icon admin-stat__icon--gold">✦</div>
+                <div>
+                  <span>Conteúdos publicados</span>
+                  <strong>{posts.length}</strong>
+                  <small>Posts independentes</small>
+                </div>
+              </article>
+              <article class="admin-stat">
+                <div class="admin-stat__icon admin-stat__icon--green">✓</div>
+                <div>
+                  <span>Tarefas concluídas</span>
+                  <strong>{doneTasks}</strong>
+                  <small>De {tasks.length} total</small>
+                </div>
+              </article>
+              <article class="admin-stat">
+                <div class="admin-stat__icon admin-stat__icon--blue">◷</div>
+                <div>
+                  <span>{pendingTasks > 0 ? 'Pendentes' : 'Status'}</span>
+                  <strong>{pendingTasks > 0 ? pendingTasks : 'Em dia'}</strong>
+                  <small>{pendingTasks > 0 ? 'Tarefa(s) aguardando' : 'Tudo atualizado'}</small>
+                </div>
+              </article>
+              <article class="admin-stat">
+                <div class="admin-stat__icon admin-stat__icon--rose">⌁</div>
+                <div>
+                  <span>Caracteres escritos</span>
+                  <strong>{contentLength.toLocaleString('pt-BR')}</strong>
+                  <small>No texto atual</small>
+                </div>
+              </article>
             </section>
 
-            <section class="admin-panel admin-post-list" id="content">
-              <div class="admin-panel__header"><div><p class="admin-eyebrow">Biblioteca editorial</p><h2>Posts publicados</h2></div><a class="admin-panel__link admin-panel__link--compact" href="/admin#editor">+ Novo post</a></div>
+            <!-- Tasks Section -->
+            <section class="admin-tasks" id="tasks">
+              <div class="admin-panel__header">
+                <div>
+                  <p class="admin-eyebrow">Gerenciamento</p>
+                  <h2>Tarefas {tasks.length > 0 && <span style="color: #8a95a5; font-size: 14px; font-weight: 400;">· {tasks.length} no total</span>}</h2>
+                </div>
+                <button class="admin-primary-link" type="button" id="task-form-open" style="border:0; font-family: inherit;"><span>+</span> Nova tarefa</button>
+              </div>
+              <div class="admin-tasks__items" id="task-list">
+                {tasks.length > 0 ? tasks.map((task) => (
+                  <div class="admin-task-item">
+                    <span class:list={['admin-task-status', `admin-task-status--${task.status}`]}></span>
+                    <div class="admin-task-content">
+                      <strong>{task.title}</strong>
+                      <small>{task.description}</small>
+                    </div>
+                    <div class="admin-task-meta">
+                      <span class:list={['admin-task-priority', `admin-task-priority--${task.priority}`]}>{task.priority}</span>
+                      {task.dueDate && <small style="color: #a5adba; font-size: 9px;">{task.dueDate}</small>}
+                    </div>
+                    <form method="POST" action="/api/admin/tasks" class="inline-task-form" style="display: contents;">
+                      <input type="hidden" name="action" value="delete" />
+                      <input type="hidden" name="taskId" value={task.id} />
+                      <button type="submit" class="admin-task-delete" aria-label={`Excluir ${task.title}`}>×</button>
+                    </form>
+                  </div>
+                )) : (
+                  <p style="color: #a5adba; font-size: 12px; padding: 12px 0;">Nenhuma tarefa ainda. Crie uma para começar a organizar seu trabalho.</p>
+                )}
+              </div>
+            </section>
+
+            <section class="admin-post-list" id="content">
+              <div class="admin-panel__header">
+                <div>
+                  <p class="admin-eyebrow">Biblioteca editorial</p>
+                  <h2>Posts publicados</h2>
+                </div>
+                <a class="admin-panel__link admin-panel__link--compact" href="/admin#editor">+ Novo post</a>
+              </div>
               <div class="admin-post-list__items">
-                {posts.map((post) => (
-                  <a class:list={['admin-post-list__item', { 'admin-post-list__item--active': post.id === editId }]} href={`/admin?edit=${post.id}#editor`}>
-                    <span class="admin-post-list__status"></span><div><strong>{post.title}</strong><small>{post.category} · {post.pubDate}</small></div><span class="admin-post-list__arrow">→</span>
-                  </a>
-                  <form method="POST" action="/api/admin/delete" class="admin-post-list__delete-form" onsubmit={`return confirm('Excluir o post "${post.title.replace(/'/g, "\\'")}"? Esta ação não pode ser desfeita.')`}>
-                    <input type="hidden" name="postId" value={post.id} />
-                    <button type="submit" class="admin-post-list__delete" aria-label={`Excluir ${post.title}`} title="Excluir post">×</button>
-                  </form>
-                ))}
+                {posts.length > 0 ? posts.map((post) => (
+                  <div class="admin-post-list-item-wrapper" style="display: contents;">
+                    <a class:list={['admin-post-list__item', { 'admin-post-list__item--active': post.id === editId }]} href={`/admin?edit=${post.id}#editor`}>
+                      <span class="admin-post-list__status"></span>
+                      <div>
+                        <strong>{post.title}</strong>
+                        <small>{post.category} · {post.pubDate}</small>
+                      </div>
+                      <span class="admin-post-list__arrow">→</span>
+                    </a>
+                    <form method="POST" action="/api/admin/delete" class="admin-post-list__delete-form" style="display: contents;" onsubmit={`return confirm('Excluir o post "${post.title.replace(/'/g, "\\'")}"? Esta ação não pode ser desfeita.')`}>
+                      <input type="hidden" name="postId" value={post.id} />
+                      <button type="submit" class="admin-task-delete" aria-label={`Excluir ${post.title}`} style="margin-left: -30px; position: relative; z-index: 2;">×</button>
+                    </form>
+                  </div>
+                )) : (
+                  <p style="color: #a5adba; font-size: 12px; padding: 12px;">Nenhum post publicado ainda.</p>
+                )}
               </div>
             </section>
 
             <section class="admin-grid">
               <article class="admin-panel admin-panel--editor" id="editor">
-                <div class="admin-panel__header"><div><p class="admin-eyebrow">Publicação principal</p><h2>Texto do Mestre</h2></div><span class="admin-live"><i></i> Ao vivo</span></div>
+                <div class="admin-panel__header">
+                  <div>
+                    <p class="admin-eyebrow">Publicação principal</p>
+                    <h2>Texto do Mestre</h2>
+                  </div>
+                  <span class="admin-live"><i></i> Ao vivo</span>
+                </div>
                 <p class="admin-panel__description">Escreva e atualize o conteúdo que aparece na página pública da taverna.</p>
                 <form method="POST" action="/api/admin/save" class="admin-editor-form">
                   <input type="hidden" name="postId" value={initialPost?.id ?? ''} />
-                  <div class="admin-post-fields"><label>Título<input name="title" value={initialPost?.title ?? ''} placeholder="Título do novo post" required /></label><label>Descrição<input name="description" value={initialPost?.description ?? ''} placeholder="Resumo para a home e o arquivo" required /></label><label>Categoria<input name="category" value={initialPost?.category ?? 'Narrativa'} required /></label></div>
-                  <div class="admin-editor-toolbar" aria-label="Ferramentas do editor"><span>HTML permitido</span><span class="admin-editor-toolbar__hint">O conteúdo será publicado em /texto-mestre</span></div><textarea name="content" spellcheck="true" aria-label="Conteúdo do Mestre">{initialContent}</textarea><div class="admin-editor-footer"><span>Salvamento manual</span><button type="submit" class="admin-save-button">Salvar publicação <span>→</span></button></div></form>
+                  <div class="admin-post-fields">
+                    <label>Título<input name="title" value={initialPost?.title ?? ''} placeholder="Título do novo post" required /></label>
+                    <label>Descrição<input name="description" value={initialPost?.description ?? ''} placeholder="Resumo para a home e o arquivo" required /></label>
+                    <label>Categoria<input name="category" value={initialPost?.category ?? 'Narrativa'} required /></label>
+                  </div>
+                  <div class="admin-editor-toolbar"><span>HTML permitido</span><span class="admin-editor-toolbar__hint">O conteúdo será publicado em /texto-mestre</span></div>
+                  <textarea name="content" spellcheck="true" aria-label="Conteúdo do Mestre">{initialContent}</textarea>
+                  <div class="admin-editor-footer">
+                    <span>Salvamento manual</span>
+                    <button type="submit" class="admin-save-button">Salvar publicação <span>→</span></button>
+                  </div>
+                </form>
               </article>
 
               <div class="admin-side-panels">
-                <article class="admin-panel admin-activity" id="activity"><div class="admin-panel__header"><div><p class="admin-eyebrow">Monitoramento</p><h2>Atividade recente</h2></div><span class="admin-more">•••</span></div><div class="admin-activity__item"><span class="admin-activity__dot admin-activity__dot--gold"></span><div><strong>Posts independentes disponíveis</strong><small>{posts.length} publicação(ões) na biblioteca</small></div></div><div class="admin-activity__item"><span class="admin-activity__dot admin-activity__dot--green"></span><div><strong>Publicação está disponível</strong><small>Visível na home e no arquivo</small></div></div><a class="admin-panel__link" href="/arquivo">Ver arquivo público <span>→</span></a></article>
-                <article class="admin-panel admin-quick" id="settings"><div class="admin-panel__header"><div><p class="admin-eyebrow">Atalhos</p><h2>Próximos passos</h2></div></div><a href="#editor"><span class="admin-quick__icon">✎</span><div><strong>Continuar escrevendo</strong><small>Voltar para o editor principal</small></div><b>→</b></a><a href="/index" target="_blank" rel="noreferrer"><span class="admin-quick__icon">⌂</span><div><strong>Visitar a taverna</strong><small>Ver a experiência pública</small></div><b>→</b></a></article>
+                <article class="admin-panel admin-activity" id="activity">
+                  <div class="admin-panel__header">
+                    <div>
+                      <p class="admin-eyebrow">Monitoramento</p>
+                      <h2>Atividade recente</h2>
+                    </div>
+                    <span class="admin-more">•••</span>
+                  </div>
+                  <div class="admin-activity__item">
+                    <span class="admin-activity__dot admin-activity__dot--gold"></span>
+                    <div>
+                      <strong>{posts.length} posts publicados</strong>
+                      <small>{posts.length} publicação(ões) na biblioteca</small>
+                    </div>
+                  </div>
+                  <div class="admin-activity__item">
+                    <span class="admin-activity__dot admin-activity__dot--green"></span>
+                    <div>
+                      <strong>{doneTasks} tarefas concluídas</strong>
+                      <small>{pendingTasks} pendente(s) · {tasks.filter(t => t.status === 'cancelled').length} cancelada(s)</small>
+                    </div>
+                  </div>
+                  <div class="admin-activity__item">
+                    <span class="admin-activity__dot admin-activity__dot--green"></span>
+                    <div>
+                      <strong>Publicação disponível</strong>
+                      <small>Visível na home e no arquivo</small>
+                    </div>
+                  </div>
+                  <a class="admin-panel__link" href="/arquivo">Ver arquivo público <span>→</span></a>
+                </article>
+
+                <article class="admin-panel admin-quick" id="settings">
+                  <div class="admin-panel__header">
+                    <div>
+                      <p class="admin-eyebrow">Atalhos</p>
+                      <h2>Próximos passos</h2>
+                    </div>
+                  </div>
+                  <a href="#editor">
+                    <span class="admin-quick__icon">✎</span>
+                    <div><strong>Continuar escrevendo</strong><small>Voltar para o editor principal</small></div>
+                    <b>→</b>
+                  </a>
+                  <a href="#tasks">
+                    <span class="admin-quick__icon">☑</span>
+                    <div><strong>Gerenciar tarefas</strong><small>{pendingTasks} tarefa(s) aguardando</small></div>
+                    <b>→</b>
+                  </a>
+                  <a href="/index" target="_blank" rel="noreferrer">
+                    <span class="admin-quick__icon">⌂</span>
+                    <div><strong>Visitar a taverna</strong><small>Ver a experiência pública</small></div>
+                    <b>→</b>
+                  </a>
+                </article>
               </div>
             </section>
 
-            <footer class="admin-footer"><span>Runas na Mesa · Painel do Mestre</span><span>Servidor local · Sessão protegida</span></footer>
+            <footer class="admin-footer">
+              <span>Runas na Mesa · Painel do Mestre v2</span>
+              <span>Sessão protegida · {tasks.length} tarefas · {posts.length} posts</span>
+            </footer>
           </div>
         </main>
       </div>
+
+      <!-- Task Creation Modal -->
+      <div class="task-form-overlay" id="task-form-overlay">
+        <div class="task-form-modal">
+          <h3>Nova tarefa</h3>
+          <form id="task-create-form" method="POST" action="/api/admin/tasks">
+            <input type="hidden" name="action" value="create" />
+            <label>Título<input name="title" placeholder="Ex: Revisar página de lore" required /></label>
+            <label>Descrição<textarea name="description" placeholder="Descreva a tarefa..."></textarea></label>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+              <label>Prioridade
+                <select name="priority">
+                  <option value="low">Baixa</option>
+                  <option value="medium" selected>Média</option>
+                  <option value="high">Alta</option>
+                  <option value="urgent">Urgente</option>
+                </select>
+              </label>
+              <label>Data limite<input name="dueDate" type="date" /></label>
+            </div>
+            <div class="task-form-actions">
+              <button type="button" class="task-form-cancel" id="task-form-cancel">Cancelar</button>
+              <button type="submit" class="task-form-submit">Criar tarefa</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
       <script>
-        const adminMenuButton = document.getElementById('admin-menu-button');
-        const adminSidebar = document.getElementById('admin-sidebar');
-        adminMenuButton?.addEventListener('click', () => { const isOpen = adminSidebar?.classList.toggle('admin-sidebar--open') ?? false; adminMenuButton.setAttribute('aria-expanded', String(isOpen)); });
+        // Menu mobile
+        const menuBtn = document.getElementById('admin-menu-button');
+        const sidebar = document.getElementById('admin-sidebar');
+        menuBtn?.addEventListener('click', () => {
+          const isOpen = sidebar?.classList.toggle('admin-sidebar--open') ?? false;
+          menuBtn.setAttribute('aria-expanded', String(isOpen));
+        });
+
+        // Task form modal
+        const openBtn = document.getElementById('task-form-open');
+        const overlay = document.getElementById('task-form-overlay');
+        const cancelBtn = document.getElementById('task-form-cancel');
+        const taskForm = document.getElementById('task-create-form');
+
+        function openModal() { overlay?.classList.add('task-form-overlay--open'); }
+        function closeModal() { overlay?.classList.remove('task-form-overlay--open'); }
+
+        openBtn?.addEventListener('click', openModal);
+        cancelBtn?.addEventListener('click', closeModal);
+        overlay?.addEventListener('click', (e) => { if (e.target === overlay) closeModal(); });
+
+        // Handle task form via fetch (SPA-like)
+        taskForm?.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const form = e.currentTarget as HTMLFormElement;
+          const data = new FormData(form);
+          const json: Record<string, unknown> = {};
+          data.forEach((v, k) => {
+            if (k === 'tags') {
+              json[k] = String(v).split(',').map(s => s.trim()).filter(Boolean);
+            } else {
+              json[k] = v;
+            }
+          });
+
+          try {
+            const res = await fetch('/api/admin/tasks', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                action: 'create',
+                task: {
+                  title: json.title,
+                  description: json.description || '',
+                  priority: json.priority || 'medium',
+                  status: 'pending',
+                  dueDate: json.dueDate || undefined,
+                  assignedTo: 'Magnus',
+                  tags: (json.tags as string[]) || [],
+                },
+              }),
+            });
+            if (res.ok) {
+              window.location.reload();
+            } else {
+              alert('Erro ao criar tarefa.');
+            }
+          } catch {
+            alert('Erro de conexão.');
+          }
+        });
       </script>
     </body>
   </html>
 ) : (
   <html lang="pt-BR">
-    <head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><title>Entrar no painel — Runas na Mesa</title><meta name="robots" content="noindex, nofollow" /></head>
-    <body class="login-body"><main class="login-shell"><a href="/" class="login-back">← Voltar para a taverna</a><section class="login-card"><div class="login-mark">✦</div><p class="admin-eyebrow">Área reservada</p><h1>Bem-vindo ao painel.</h1><p>Entre para administrar as histórias e os segredos da taverna.</p>{status === 'invalid' && <div class="admin-alert admin-alert--error"><span>!</span> Credenciais inválidas.</div>}<form method="POST" action="/api/admin/login" class="login-form"><label for="username">Usuário</label><input id="username" name="username" type="text" autocomplete="username" placeholder="Seu usuário" required /><label for="password">Senha</label><input id="password" name="password" type="password" autocomplete="current-password" placeholder="Sua senha" required /><button type="submit" class="admin-save-button">Entrar no painel <span>→</span></button></form><small class="login-note">Acesso restrito ao administrador da taverna.</small></section></main></body>
+    <head>
+      <meta charset="utf-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <title>Entrar no painel — Runas na Mesa</title>
+      <meta name="robots" content="noindex, nofollow" />
+      <link rel="stylesheet" href="/admin.css" />
+    </head>
+    <body class="login-body">
+      <main class="login-shell">
+        <a href="/" class="login-back">← Voltar para a taverna</a>
+        <section class="login-card">
+          <div class="login-mark">✦</div>
+          <p class="admin-eyebrow">Área reservada</p>
+          <h1>Bem-vindo ao painel.</h1>
+          <p>Entre para administrar as histórias e os segredos da taverna.</p>
+          {status === 'invalid' && <div class="admin-alert admin-alert--error"><span>!</span> Credenciais inválidas.</div>}
+          <form method="POST" action="/api/admin/login" class="login-form">
+            <label for="username">Usuário</label>
+            <input id="username" name="username" type="text" autocomplete="username" placeholder="Seu usuário" required />
+            <label for="password">Senha</label>
+            <input id="password" name="password" type="password" autocomplete="current-password" placeholder="Sua senha" required />
+            <button type="submit" class="admin-save-button">Entrar no painel <span>→</span></button>
+          </form>
+          <small class="login-note">Acesso restrito ao administrador da taverna.</small>
+        </section>
+      </main>
+    </body>
   </html>
 )}
-
-<style>
-  :global(*) { box-sizing: border-box; }
-  :global(html) { scroll-behavior: smooth; }
-  :global(body) { margin: 0; }
-  :global(a) { color: inherit; text-decoration: none; }
-  :global(button), :global(input), :global(textarea) { font: inherit; }
-
-  .admin-body { min-height: 100vh; background: #f4f5f7; color: #172033; font-family: 'Montserrat', 'Segoe UI', sans-serif; }
-  .admin-app { display: flex; min-height: 100vh; }
-  .admin-sidebar { position: fixed; inset: 0 auto 0 0; z-index: 20; display: flex; flex-direction: column; width: 252px; padding: 26px 16px 18px; background: #111a2b; color: #e9edf5; box-shadow: 8px 0 28px rgba(20, 30, 49, .07); }
-  .admin-brand { display: flex; align-items: center; gap: 11px; padding: 0 12px 30px; }
-  .admin-brand__mark { display: grid; place-items: center; width: 34px; height: 34px; color: #d8aa56; border: 1px solid rgba(216,170,86,.45); border-radius: 9px; }
-  .admin-brand strong, .admin-brand span { display: block; }.admin-brand strong { font: 600 11px/1.2 'Cinzel', Georgia, serif; letter-spacing: .08em; }.admin-brand span { margin-top: 5px; color: #8e9bb0; font-size: 10px; }
-  .admin-nav { display: grid; gap: 4px; }.admin-nav__label { padding: 18px 12px 8px; color: #66758b; font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
-  .admin-nav__link, .admin-logout { display: flex; align-items: center; gap: 12px; min-height: 42px; padding: 0 12px; color: #aeb9c9; border: 0; border-radius: 8px; background: transparent; font-size: 12px; text-align: left; transition: background 180ms ease, color 180ms ease; }
-  .admin-nav__link:hover, .admin-nav__link--active { color: #fff; background: #1d2a40; }.admin-nav__link--active { box-shadow: inset 3px 0 #d8aa56; }
-  .admin-nav__link svg, .admin-logout svg, .admin-sidebar__site svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.5; }.admin-nav__badge { margin-left: auto; min-width: 18px; padding: 2px 5px; color: #172033; background: #d8aa56; border-radius: 10px; font-size: 10px; text-align: center; }
-  .admin-sidebar__bottom { margin-top: auto; display: grid; gap: 8px; padding-top: 18px; border-top: 1px solid rgba(255,255,255,.08); }.admin-sidebar__site, .admin-logout { justify-content: space-between; width: 100%; cursor: pointer; }.admin-sidebar__site { display: flex; align-items: center; padding: 0 12px; color: #aeb9c9; font-size: 11px; }.admin-sidebar__site:hover, .admin-logout:hover { color: #d8aa56; }.admin-logout { color: #8e9bb0; }
-  .admin-main { width: calc(100% - 252px); margin-left: 252px; }.admin-topbar { display: flex; align-items: center; justify-content: space-between; height: 72px; padding: 0 42px; background: #fff; border-bottom: 1px solid #e4e7ec; }.admin-breadcrumb { display: flex; align-items: center; gap: 10px; color: #9aa4b3; font-size: 12px; }.admin-breadcrumb b { color: #c8cdd5; font-weight: 400; }.admin-breadcrumb strong { color: #334158; font-weight: 600; }.admin-topbar__actions { display: flex; align-items: center; gap: 25px; }.admin-preview-link { color: #6b778b; font-size: 11px; }.admin-preview-link:hover { color: #bd8b37; }.admin-preview-link span { color: #bd8b37; font-size: 15px; }.admin-user { display: flex; align-items: center; gap: 9px; color: #354259; font-size: 12px; font-weight: 600; }.admin-user__avatar { display: grid; place-items: center; width: 30px; height: 30px; color: #fff; background: #c7943e; border-radius: 50%; font-family: Georgia, serif; }.admin-user i { width: 6px; height: 6px; background: #5dbc88; border-radius: 50%; }
-  .admin-content { max-width: 1380px; margin: 0 auto; padding: 43px 42px 28px; }.admin-heading { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 30px; }.admin-eyebrow { margin: 0 0 8px; color: #a0a9b7; font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }.admin-heading h1 { margin: 0; color: #202c40; font: 600 28px/1.2 'Cinzel', Georgia, serif; }.admin-lead { margin: 9px 0 0; color: #7c8798; font-size: 13px; }.admin-primary-link, .admin-save-button { display: inline-flex; align-items: center; gap: 8px; color: #fff; background: #c7943e; border: 0; border-radius: 7px; cursor: pointer; font-size: 12px; font-weight: 600; }.admin-primary-link { padding: 11px 16px; box-shadow: 0 5px 12px rgba(199,148,62,.18); }.admin-primary-link span { font-size: 18px; line-height: 10px; }
-  .admin-alert { display: flex; align-items: center; gap: 9px; margin: -10px 0 25px; padding: 12px 15px; border-radius: 7px; font-size: 12px; }.admin-alert span { display: grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; font-weight: 700; }.admin-alert--success { color: #367555; background: #eaf7ef; }.admin-alert--success span { color: #fff; background: #5fbd88; }.admin-alert--error { color: #a34c4c; background: #fceeee; }.admin-alert--error span { color: #fff; background: #d77979; }
-  .admin-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 26px; }.admin-stat { display: flex; align-items: center; gap: 14px; min-height: 106px; padding: 19px; background: #fff; border: 1px solid #e7e9ee; border-radius: 9px; }.admin-stat__icon { display: grid; place-items: center; width: 39px; height: 39px; border-radius: 9px; font-size: 17px; }.admin-stat__icon--gold { color: #bd8933; background: #fcf4e5; }.admin-stat__icon--green { color: #42a777; background: #eaf7ef; }.admin-stat__icon--blue { color: #5f92c9; background: #eaf2fb; }.admin-stat__icon--rose { color: #c97c88; background: #fbecef; }.admin-stat span, .admin-stat small { display: block; color: #8a95a5; font-size: 10px; }.admin-stat strong { display: block; margin: 5px 0 3px; color: #27354c; font-size: 19px; font-weight: 600; }.admin-stat small { color: #b0b7c2; font-size: 9px; }
-  .admin-post-list { margin-bottom: 22px; padding: 20px 23px; }.admin-panel__link--compact { margin: 0; padding: 0; border: 0; }.admin-post-list__items { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 17px; }.admin-post-list__item { display: flex; align-items: center; gap: 11px; min-width: 0; padding: 11px 12px; border: 1px solid #edf0f3; border-radius: 6px; }.admin-post-list__item:hover, .admin-post-list__item--active { border-color: #d8aa56; background: #fffcf5; }.admin-post-list__status { flex: 0 0 auto; width: 7px; height: 7px; background: #62c48f; border-radius: 50%; }.admin-post-list__item div { min-width: 0; flex: 1; }.admin-post-list__item strong, .admin-post-list__item small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }.admin-post-list__item strong { color: #4a576b; font-size: 11px; }.admin-post-list__item small { margin-top: 3px; color: #a5adba; font-size: 9px; }.admin-post-list__arrow { color: #b88330; font-size: 15px; }
-  .admin-grid { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(260px, .9fr); gap: 22px; }.admin-panel { background: #fff; border: 1px solid #e7e9ee; border-radius: 9px; }.admin-panel--editor { padding: 25px; }.admin-panel__header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }.admin-panel h2 { margin: 0; color: #25334a; font-size: 18px; font-weight: 600; }.admin-panel__description { margin: 8px 0 21px; color: #8490a0; font-size: 12px; }.admin-live { display: inline-flex; align-items: center; gap: 6px; color: #54a979; font-size: 10px; font-weight: 600; }.admin-live i { width: 6px; height: 6px; background: #62c48f; border-radius: 50%; }
-  .admin-editor-form { display: grid; gap: 0; overflow: hidden; border: 1px solid #dfe3e9; border-radius: 7px; }.admin-post-fields { display: grid; grid-template-columns: 1.2fr 1.6fr .8fr; gap: 12px; padding: 14px; background: #fff; border-bottom: 1px solid #e6e9ee; }.admin-post-fields label { display: grid; gap: 6px; color: #7d8999; font-size: 10px; font-weight: 600; }.admin-post-fields input { width: 100%; padding: 9px 10px; color: #344158; border: 1px solid #dfe3e9; border-radius: 5px; outline: 0; font-size: 11px; }.admin-post-fields input:focus { border-color: #c7943e; box-shadow: 0 0 0 3px rgba(199,148,62,.12); }.admin-editor-toolbar { display: flex; justify-content: space-between; padding: 10px 13px; color: #68768a; background: #fafbfc; border-bottom: 1px solid #e6e9ee; font-size: 10px; font-weight: 600; }.admin-editor-toolbar__hint { color: #aab2bd; font-weight: 400; }.admin-editor-form textarea { width: 100%; min-height: 310px; padding: 17px; color: #344158; background: #fff; border: 0; outline: 0; resize: vertical; font: 13px/1.7 'Montserrat', sans-serif; }.admin-editor-footer { display: flex; align-items: center; justify-content: space-between; padding: 10px 13px; background: #fafbfc; border-top: 1px solid #e6e9ee; color: #a0a9b5; font-size: 10px; }.admin-save-button { padding: 9px 14px; }.admin-save-button:hover { background: #ad7c2f; }.admin-save-button span { font-size: 16px; line-height: 10px; }
-  .admin-side-panels { display: grid; align-content: start; gap: 22px; }.admin-activity, .admin-quick { padding: 23px; }.admin-more { color: #9da8b7; letter-spacing: 3px; }.admin-activity__item { display: flex; gap: 12px; margin-top: 23px; }.admin-activity__dot { flex: 0 0 auto; width: 8px; height: 8px; margin-top: 4px; border-radius: 50%; }.admin-activity__dot--gold { background: #d4a250; }.admin-activity__dot--green { background: #63bd8b; }.admin-activity strong, .admin-activity small { display: block; }.admin-activity strong { color: #4a576b; font-size: 11px; }.admin-activity small { margin-top: 5px; color: #a5adba; font-size: 10px; }.admin-panel__link { display: flex; justify-content: space-between; margin-top: 25px; padding-top: 16px; color: #b88330; border-top: 1px solid #edf0f3; font-size: 11px; font-weight: 600; }.admin-quick > a { display: grid; grid-template-columns: 32px 1fr auto; align-items: center; gap: 11px; padding: 13px 0; border-bottom: 1px solid #edf0f3; }.admin-quick > a:last-child { border-bottom: 0; }.admin-quick__icon { display: grid; place-items: center; width: 32px; height: 32px; color: #bd8933; background: #fcf4e5; border-radius: 7px; }.admin-quick strong, .admin-quick small { display: block; }.admin-quick strong { color: #4a576b; font-size: 11px; }.admin-quick small { margin-top: 4px; color: #a5adba; font-size: 9px; }.admin-quick b { color: #b88330; font-size: 16px; font-weight: 400; }.admin-footer { display: flex; justify-content: space-between; margin-top: 31px; color: #aeb5c0; font-size: 10px; }.admin-menu-button { display: none; }
-  .login-body { display: grid; place-items: center; min-height: 100vh; background: #111a2b; }.login-shell { width: min(100% - 40px, 430px); }.login-back { display: inline-block; margin-bottom: 24px; color: #9eabc0; font-size: 11px; }.login-back:hover { color: #d8aa56; }.login-card { padding: 35px; background: #fff; border-radius: 12px; box-shadow: 0 20px 70px rgba(0,0,0,.22); }.login-mark { display: grid; place-items: center; width: 42px; height: 42px; margin-bottom: 25px; color: #bd8933; background: #fcf4e5; border-radius: 10px; font-size: 20px; }.login-card h1 { margin: 0; color: #25334a; font: 600 25px/1.25 'Cinzel', Georgia, serif; }.login-card > p:not(.admin-eyebrow) { margin: 10px 0 26px; color: #7f8b9d; font-size: 12px; line-height: 1.6; }.login-form { display: grid; gap: 9px; }.login-form label { margin-top: 6px; color: #526076; font-size: 11px; font-weight: 600; }.login-form input { width: 100%; padding: 12px 13px; color: #28364b; border: 1px solid #dce1e8; border-radius: 6px; outline: 0; font-size: 12px; }.login-form input:focus { border-color: #c7943e; box-shadow: 0 0 0 3px rgba(199,148,62,.12); }.login-form .admin-save-button { justify-content: center; width: 100%; margin-top: 14px; padding-block: 12px; }.login-note { display: block; margin-top: 22px; color: #aab2bf; font-size: 10px; text-align: center; }
-  @media (max-width: 1050px) { .admin-content { padding-inline: 25px; }.admin-topbar { padding-inline: 25px; }.admin-stats { grid-template-columns: repeat(2, 1fr); } }
-  @media (max-width: 760px) { .admin-sidebar { transform: translateX(-100%); transition: transform 220ms ease; }.admin-sidebar--open { transform: translateX(0); }.admin-main { width: 100%; margin-left: 0; }.admin-menu-button { display: grid; gap: 4px; width: 28px; padding: 5px 0; background: transparent; border: 0; cursor: pointer; }.admin-menu-button span { display: block; width: 19px; height: 2px; background: #67758a; }.admin-topbar { gap: 14px; padding-inline: 19px; }.admin-breadcrumb { margin-right: auto; }.admin-topbar__actions { gap: 10px; }.admin-preview-link { display: none; }.admin-user > span:not(.admin-user__avatar), .admin-user i { display: none; }.admin-content { padding: 28px 18px; }.admin-heading { align-items: flex-start; flex-direction: column; gap: 20px; }.admin-heading h1 { font-size: 23px; }.admin-grid { grid-template-columns: 1fr; }.admin-footer { flex-direction: column; gap: 7px; }.admin-editor-toolbar__hint { display: none; }.admin-post-fields, .admin-post-list__items { grid-template-columns: 1fr; } }
-  @media (max-width: 480px) { .admin-stats { grid-template-columns: 1fr; }.admin-stat { min-height: 88px; }.admin-panel--editor, .admin-activity, .admin-quick { padding: 18px; }.admin-editor-footer { align-items: flex-start; flex-direction: column; gap: 10px; }.admin-save-button { width: 100%; justify-content: center; }.login-card { padding: 27px 22px; } }
-</style>

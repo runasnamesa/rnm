@@ -1,0 +1,7 @@
+# Runas na Mesa
+# https://runasnamesa.com.br
+
+User-agent: *
+Allow: /
+
+Sitemap: https://runasnamesa.com.br/sitemap-index.xml

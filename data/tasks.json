@@ -1,0 +1,37 @@
+{
+  "tasks": [
+    {
+      "id": "exemplo-1",
+      "title": "Escrever novo post sobre Dungeons & Dragons",
+      "description": "Criar um guia introdutório para novos jogadores.",
+      "status": "pending",
+      "priority": "high",
+      "createdAt": "2026-07-22T11:00:00.000Z",
+      "dueDate": "2026-07-29",
+      "assignedTo": "Magnus",
+      "tags": ["conteúdo", "dnd", "guias"]
+    },
+    {
+      "id": "exemplo-2",
+      "title": "Revisar design da página de lore",
+      "description": "Melhorar a apresentação visual dos artigos de lore.",
+      "status": "in_progress",
+      "priority": "medium",
+      "createdAt": "2026-07-20T08:00:00.000Z",
+      "dueDate": "2026-07-26",
+      "assignedTo": "Magnus",
+      "tags": ["design", "frontend"]
+    },
+    {
+      "id": "exemplo-3",
+      "title": "Preparar integração com Substack",
+      "description": "Automatizar importação de novos posts do Substack para o site.",
+      "status": "pending",
+      "priority": "low",
+      "createdAt": "2026-07-18T14:00:00.000Z",
+      "dueDate": "2026-08-05",
+      "assignedTo": "Magnus",
+      "tags": ["automação", "n8n"]
+    }
+  ]
+}
