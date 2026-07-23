@@ -8,4 +8,8 @@ export default defineConfig({
   trailingSlash: 'ignore',
   output: 'server',
   adapter: node({ mode: 'standalone' }),
+  vite: {
+    // Evita locks do OneDrive no cache padrão dentro de node_modules.
+    cacheDir: '.astro-vite-cache',
+  },
 });

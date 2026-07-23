@@ -1,4 +1,7 @@
 export const WELCOME_CONFIG = {
+  // A experiência volta a ser exibida depois deste período.
+  daysUntilShowAgain: 2,
+
   // Audio ambiente
   audio: {
     src: '/audio/tavern-ambient.m4a',
@@ -7,15 +10,19 @@ export const WELCOME_CONFIG = {
 
   // Durações da cinemática (ms)
   timing: {
-    stormAlone: 300,       // State 1: só tempestade
-    lightAppears: 300,     // State 2: luz distante
-    cameraApproach: 400,   // State 3: câmera se aproxima
-    doorVisible: 300,      // State 4: porta à vista
-    doorIdle: 200,         // State 5: porta visível, aguarda clique
-    doorOpening: 300,      // State 6-7: porta abrindo
-    lightTransition: 300,  // State 8-9: luz invade tela
-    tavernReveal: 500,     // State 10-12: taverna revelada, pausa
-    blogTransition: 500,   // State 13-15: taverna vira interface
+    stormAlone: 3000,
+    lightAppears: 3000,
+    cameraApproach: 4000,
+    doorVisible: 3000,
+    doorOpening: 3000,
+    lightTransition: 3000,
+    crossing: 3000,
+    stormBehind: 3000,
+    tavernReveal: 5000,
+    cameraAdjust: 3000,
+    pauseMoment: 5000,
+    blogTransition: 5000,
+    interfaceReveal: 5000,
   },
 
   // Nevasca — 6 camadas
