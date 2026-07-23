@@ -1,6 +1,7 @@
 ---
 import { ClientRouter } from 'astro:transitions';
 import Analytics from '@vercel/analytics/astro';
+import SpeedInsights from '@vercel/speed-insights/astro';
 import Navbar from '../components/Navbar.astro';
 import Footer from '../components/Footer.astro';
 import GlobalAudio from '../components/GlobalAudio.astro';
@@ -32,6 +33,7 @@ const ogImageURL = ogImage.startsWith('http')
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <Analytics />
+    <SpeedInsights />
 
     <!-- Favicons -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
