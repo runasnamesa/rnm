@@ -30,17 +30,25 @@ const DEFAULT_POST: Omit<MasterPost, 'content'> = {
   readTime: 'Leitura do Mestre',
 };
 
-async function ensureStorage() {
-  await fs.mkdir(path.dirname(ADMIN_DATA_PATH), { recursive: true });
+// In-memory fallback if filesystem is read-only (e.g. Vercel Serverless)
+let inMemoryPostsCache: MasterPost[] | null = null;
 
+async function ensureStorage() {
   try {
+    await fs.mkdir(path.dirname(ADMIN_DATA_PATH), { recursive: true });
     await fs.access(ADMIN_DATA_PATH);
-  } catch {
-    await fs.writeFile(
-      ADMIN_DATA_PATH,
-      JSON.stringify({ content: DEFAULT_CONTENT }, null, 2),
-      'utf8',
-    );
+  } catch (err: any) {
+    if (err.code === 'ENOENT') {
+      try {
+        await fs.writeFile(
+          ADMIN_DATA_PATH,
+          JSON.stringify({ content: DEFAULT_CONTENT }, null, 2),
+          'utf8',
+        );
+      } catch (writeErr) {
+        console.warn('[Storage] Read-only filesystem detected on Vercel/serverless. Using in-memory fallback.');
+      }
+    }
   }
 }
 
@@ -66,18 +74,27 @@ export async function writeStoredContent(content: string) {
 }
 
 export async function readStoredPosts(): Promise<MasterPost[]> {
+  if (inMemoryPostsCache) {
+    return inMemoryPostsCache;
+  }
+
   await ensureStorage();
 
-  const raw = await fs.readFile(ADMIN_DATA_PATH, 'utf8');
-  const parsed = JSON.parse(raw) as Partial<MasterPost> | MasterPost[];
-  const posts = Array.isArray(parsed) ? parsed : [parsed];
+  try {
+    const raw = await fs.readFile(ADMIN_DATA_PATH, 'utf8');
+    const parsed = JSON.parse(raw) as Partial<MasterPost> | MasterPost[];
+    const posts = Array.isArray(parsed) ? parsed : [parsed];
 
-  return posts.map((post, index) => ({
-    ...DEFAULT_POST,
-    ...post,
-    id: post.id ?? (index === 0 ? DEFAULT_POST.id : makePostId(post.title ?? 'post')),
-    content: post.content ?? DEFAULT_CONTENT,
-  }));
+    const result = posts.map((post, index) => ({
+      ...DEFAULT_POST,
+      ...post,
+      id: post.id ?? (index === 0 ? DEFAULT_POST.id : makePostId(post.title ?? 'post')),
+      content: post.content ?? DEFAULT_CONTENT,
+    }));
+    return result;
+  } catch {
+    return [{ ...DEFAULT_POST, content: DEFAULT_CONTENT }];
+  }
 }
 
 export async function readStoredPost(id?: string): Promise<MasterPost> {
@@ -86,9 +103,14 @@ export async function readStoredPost(id?: string): Promise<MasterPost> {
 }
 
 export async function writeStoredPosts(posts: MasterPost[]) {
-  await ensureStorage();
+  inMemoryPostsCache = posts;
 
-  await fs.writeFile(ADMIN_DATA_PATH, JSON.stringify(posts, null, 2), 'utf8');
+  try {
+    await ensureStorage();
+    await fs.writeFile(ADMIN_DATA_PATH, JSON.stringify(posts, null, 2), 'utf8');
+  } catch (err) {
+    console.warn('[Storage] Write bypassed due to read-only environment.');
+  }
 }
 
 export async function writeStoredPost(post: MasterPost) {

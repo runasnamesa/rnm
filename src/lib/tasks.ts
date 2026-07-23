@@ -14,6 +14,7 @@ export interface Task {
 }
 
 const TASKS_PATH = path.join(process.cwd(), 'data', 'tasks.json');
+let inMemoryTasksCache: Task[] | null = null;
 
 function makeTaskId(title: string): string {
   const slug = title
@@ -27,28 +28,46 @@ function makeTaskId(title: string): string {
 }
 
 async function ensureStorage() {
-  await fs.mkdir(path.dirname(TASKS_PATH), { recursive: true });
   try {
+    await fs.mkdir(path.dirname(TASKS_PATH), { recursive: true });
     await fs.access(TASKS_PATH);
-  } catch {
-    await fs.writeFile(
-      TASKS_PATH,
-      JSON.stringify({ tasks: [] }, null, 2),
-      'utf8',
-    );
+  } catch (err: any) {
+    if (err.code === 'ENOENT') {
+      try {
+        await fs.writeFile(
+          TASKS_PATH,
+          JSON.stringify({ tasks: [] }, null, 2),
+          'utf8',
+        );
+      } catch (writeErr) {
+        console.warn('[Tasks] Read-only filesystem detected. Using in-memory fallback.');
+      }
+    }
   }
 }
 
 export async function readTasks(): Promise<Task[]> {
+  if (inMemoryTasksCache) {
+    return inMemoryTasksCache;
+  }
   await ensureStorage();
-  const raw = await fs.readFile(TASKS_PATH, 'utf8');
-  const parsed = JSON.parse(raw);
-  return parsed.tasks ?? [];
+  try {
+    const raw = await fs.readFile(TASKS_PATH, 'utf8');
+    const parsed = JSON.parse(raw);
+    return parsed.tasks ?? [];
+  } catch {
+    return [];
+  }
 }
 
 export async function writeTasks(tasks: Task[]) {
-  await ensureStorage();
-  await fs.writeFile(TASKS_PATH, JSON.stringify({ tasks }, null, 2), 'utf8');
+  inMemoryTasksCache = tasks;
+  try {
+    await ensureStorage();
+    await fs.writeFile(TASKS_PATH, JSON.stringify({ tasks }, null, 2), 'utf8');
+  } catch (err) {
+    console.warn('[Tasks] Write bypassed due to read-only environment.');
+  }
 }
 
 export async function createTask(input: Omit<Task, 'id' | 'createdAt'>): Promise<Task> {

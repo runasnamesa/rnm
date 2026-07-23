@@ -22,3 +22,27 @@ Data: 2026-07-21 - MOB
 - Post persistido do Mestre integrado ao destaque da tela inicial, com os posts Markdown mantidos na grade de textos recentes.
 - Conteúdo do Mestre convertido em coleção de posts independentes, com criação por id, edição individual e migração compatível do registro antigo.
 - Cada novo post ganhou rota pública própria, presença na home e entrada no Arquivo.
+
+Data: 2026-07-23 - REESTRUTURAÇÃO COMPLETA & VERCEL FIX
+
+- Reorganização e limpeza da estrutura do projeto: remoção de 5 componentes/arquivos órfãos e não utilizados (Snow.astro, MisteriousDoor.astro, WelcomeButton.astro, WelcomeScene.astro e public/admin.css).
+- Dependências NPM corrigidas e otimizadas: substituição do adapter incompatível @astrojs/node pelo @astrojs/vercel (^11.0.3) configurado em modo SSR.
+- Compatibilidade de Node.js no Vercel corrigida: parâmetro `engines.node` ajustado para `>=20.0.0` (evitando falhas no ambiente de build Vercel).
+- Reestruturação completa da Welcome Page seguindo o Roteiro da Animação ("Da Tempestade para a Taverna") em 15 estados cinematográficos sequenciais:
+  1. TEMPESTADE (0-3s) — Nevasca e vento hostil inicial.
+  2. LUZ DISTANTE (3-6s) — Beacon de luz fraca surgindo.
+  3. APROXIMAÇÃO (6-10s) — Avanço de câmera e surgimento do portal.
+  4. PORTA À VISTA (10-13s) — Porta rúnica visível com vazamento de luz.
+  5. INTERAÇÃO (13-15s) — Prompt de clique/tap interativo com hover dourado.
+  6. PORTA COMEÇA A ABRIR (15-18s) — Abertura em 3D com áudio de rangido.
+  7. LUZ INVADE A CENA (18-21s) — Clarão interno tomando a tela.
+  8. TRAVESSIA (21-24s) — Avanço de câmera atravessando a porta.
+  9. TEMPESTADE FICA PARA TRÁS (24-27s) — Extinção do ambiente frio exterior.
+  10. REVELAÇÃO DA TAVERNA (27-32s) — Surgimento da taverna com lareira animada.
+  11. CÂMERA SE AJUSTA (32-35s) — Ajuste de exposição da iluminação interna.
+  12. MOMENTO DE TRANSIÇÃO (35-40s) — Pausa meditativa ("Você encontrou o refúgio").
+  13. TRANSIÇÃO PARA O BLOG (40-45s) — Frame de pré-carregamento do site.
+  14. TAVERNA SE TORNA INTERFACE (45-50s) — Fusão da taverna com a UI do blog.
+  15. PRONTO PARA EXPLORAR (50s+) — Transição final fluida para /index.
+- Performance de execução aperfeiçoada sem gargalos: cap de dpr em 2.0 no Canvas, redução de 50% nas partículas em dispositivos móveis, e animações com GPU-acceleration (will-change e transform 3D).
+- Resiliência Vercel adicionada ao sistema de persistência em `admin.ts` e `tasks.ts` com fallback em memória para evitar crashes em sistemas de arquivos read-only.

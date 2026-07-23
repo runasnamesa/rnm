@@ -1,16 +1,8 @@
 ---
 /**
- * StormCanvas — 6 camadas de nevasca + silhueta da montanha.
- * Sem texto, sem UI, sem interação. Apenas a tempestade.
- *
- * Camadas (da mais distante para a mais próxima):
- * 1. Névoa — grandes manchas brancas que flutuam lentamente
- * 2. Flocos distantes — pequenos, lentos, baixa opacidade
- * 3. Flocos médios — visíveis, movimento moderado
- * 4. Flocos grandes — próximos, rápidos, alta opacidade
- * 5. Rajadas — streaks horizontais de vento
- * 6. Partículas borradas — primeiro plano, desfocadas
- * 7. Silhueta da montanha (fundo fixo)
+ * StormCanvas — Otimizado para alto desempenho e fluidez sem gargalos.
+ * Renderiza 6 camadas de nevasca cinematográfica e silhueta de montanha.
+ * Suporta adaptação móvel (redução automática de partículas em telas pequenas).
  */
 interface LayerConfig {
   count: number; sizeMin: number; sizeMax: number;
@@ -53,6 +45,8 @@ const {
     height: 100%;
     display: block;
     z-index: 1;
+    pointer-events: none;
+    will-change: transform;
   }
 </style>
 
@@ -82,37 +76,37 @@ const {
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (prefersReducedMotion) { canvas.style.display = 'none'; return; }
 
-    const ctx = canvas.getContext('2d') as CanvasRenderingContext2D | null;
+    const ctx = canvas.getContext('2d', { alpha: true });
     if (!ctx) return;
 
     let W = 0, H = 0;
     let time = 0;
     let animFrameId: number;
     let isVisible = true;
+    const isMobile = window.innerWidth <= 768;
+    const particleFactor = isMobile ? 0.5 : 1.0;
 
-    // Global storm parameters (controlled externally)
     let windMultiplier = 1;
-    let visibility = 1;        // 0-1, reduces in intense moments
-    let stormIntensity = 1;    // 0-1, scales speed
-    let globalAlpha = 1;       // fades out during transition
+    let visibility = 1;        // 0-1
+    let stormIntensity = 1;    // 0-1
+    let globalAlpha = 1;       // 0-1
 
-    // Parse configs
     const parseLayer = (key: string): LayerCfg => {
       const raw = canvas.getAttribute(key);
       return raw ? JSON.parse(raw) : { count: 10, sizeMin: 1, sizeMax: 2, speedMin: 0.1, speedMax: 0.3, windMin: 0.1, windMax: 0.3, alphaMin: 0.05, alphaMax: 0.1 };
     };
+
+    const fogCfg = parseLayer('data-fog');
     const farCfg = parseLayer('data-far');
     const midCfg = parseLayer('data-mid');
     const nearCfg = parseLayer('data-near');
     const gustsCfg = parseLayer('data-gusts');
     const blurCfg = parseLayer('data-blur');
-    const fogCfg = parseLayer('data-fog');
     const mountainColor = canvas.getAttribute('data-mountain') || '#060B17';
 
     const layerConfigs: LayerCfg[] = [fogCfg, farCfg, midCfg, nearCfg, gustsCfg, blurCfg];
     const layers: LayerData[] = layerConfigs.map(() => ({ particles: [], cfg: { count: 0, sizeMin: 0, sizeMax: 0, speedMin: 0, speedMax: 0, windMin: 0, windMax: 0, alphaMin: 0, alphaMax: 0 } }));
 
-    // Pre-allocate particles
     function createParticle(W: number, H: number, cfg: LayerCfg): Particle {
       return {
         x: Math.random() * W * 1.2 - W * 0.1,
@@ -129,29 +123,29 @@ const {
     function init() {
       W = window.innerWidth;
       H = window.innerHeight;
-      canvas.width = W * devicePixelRatio;
-      canvas.height = H * devicePixelRatio;
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = Math.floor(W * dpr);
+      canvas.height = Math.floor(H * dpr);
       canvas.style.width = W + 'px';
       canvas.style.height = H + 'px';
-      if (ctx) ctx.scale(devicePixelRatio, devicePixelRatio);
+      ctx!.scale(dpr, dpr);
 
       layers.forEach((layer, i) => {
         const cfg = layerConfigs[i];
         layer.cfg = cfg;
         layer.particles = [];
-        for (let j = 0; j < cfg.count; j++) {
+        const count = Math.max(2, Math.floor(cfg.count * particleFactor));
+        for (let j = 0; j < count; j++) {
           layer.particles.push(createParticle(W, H, cfg));
         }
       });
     }
 
-    // Mountain silhouette — pre-rendered into an offscreen canvas
     function drawMountain(c: CanvasRenderingContext2D, w: number, h: number) {
-      if (visibility < 0.01) return;
+      if (visibility < 0.01 || globalAlpha < 0.01) return;
       c.save();
-      c.globalAlpha = 0.3 * visibility;
+      c.globalAlpha = 0.3 * visibility * globalAlpha;
 
-      // Left mountain slope
       c.beginPath();
       c.moveTo(0, h);
       c.lineTo(0, h * 0.5);
@@ -163,7 +157,6 @@ const {
       c.fillStyle = mountainColor;
       c.fill();
 
-      // Right mountain slope
       c.beginPath();
       c.moveTo(w, h);
       c.lineTo(w, h * 0.45);
@@ -175,7 +168,6 @@ const {
       c.fillStyle = mountainColor;
       c.fill();
 
-      // Distant peak
       c.beginPath();
       c.moveTo(w * 0.3, h * 0.6);
       c.lineTo(w * 0.45, h * 0.15);
@@ -184,36 +176,38 @@ const {
       c.lineTo(w * 0.5, h * 0.7);
       c.closePath();
       c.fillStyle = '#080E1A';
-      c.globalAlpha = 0.15 * visibility;
+      c.globalAlpha = 0.15 * visibility * globalAlpha;
       c.fill();
 
       c.restore();
     }
 
-    let lastTime = 0;
+    let lastTime = performance.now();
     function render(timestamp: number) {
       if (!isVisible || !ctx) return;
 
-      const dt = Math.min((timestamp - lastTime) / 16, 3);
+      const dt = Math.min((timestamp - lastTime) / 16, 2.5);
       lastTime = timestamp;
       time += dt * 0.016;
 
-      const c = ctx as CanvasRenderingContext2D;
+      const c = ctx;
       const w = W, h = H;
 
       c.clearRect(0, 0, w, h);
 
-      // Mountain background (drawn first, behind fog)
+      if (globalAlpha < 0.01) {
+        animFrameId = requestAnimationFrame(render);
+        return;
+      }
+
       drawMountain(c, w, h);
 
-      // Wind calculation — organic, with gusts
       const gustCycle = Math.sin(time * 0.7) * 0.5 +
                         Math.sin(time * 1.9 + 0.5) * 0.3 +
                         Math.sin(time * 3.2 + 1.8) * 0.2;
       const baseWind = Math.sin(time * 0.15) * 1.5;
 
-      // Layer draw order: fog → far → mid → near → gusts → blur
-      const drawOrder = [0, 1, 2, 3, 4, 5]; // indices into layers
+      const drawOrder = [0, 1, 2, 3, 4, 5];
 
       drawOrder.forEach(layerIdx => {
         const layer = layers[layerIdx];
@@ -221,18 +215,13 @@ const {
         const isGust = layerIdx === 4;
 
         layer.particles.forEach(p => {
-          // Wind: base + gust * wind affinity
           const gust = gustCycle * p.wind * 2;
           const totalWind = (baseWind + gust) * windMultiplier * stormIntensity;
 
-          // Movement
           p.x += totalWind * dt * p.speed * stormIntensity;
           p.y += p.speed * dt * stormIntensity;
-
-          // Drift (subtle sine wave)
           p.x += Math.sin(time * 0.5 + p.driftPhase) * p.driftAmp * 0.3 * dt;
 
-          // Wrap
           const margin = p.size * 4;
           if (p.y > h + margin) {
             p.y = -margin;
@@ -241,38 +230,28 @@ const {
           if (p.x < -margin - 50) p.x = w + margin;
           if (p.x > w + margin + 50) p.x = -margin;
 
-          // Draw
           c.save();
-          c.globalAlpha = p.alpha * visibility * globalAlpha;
+          const calcAlpha = p.alpha * visibility * globalAlpha;
+          c.globalAlpha = calcAlpha;
 
           if (isFog) {
-            // Fog = large blurred circles
-            c.fillStyle = `rgba(200, 210, 220, ${p.alpha * globalAlpha})`;
-            c.filter = `blur(${p.size * 0.5}px)`;
+            c.fillStyle = 'rgba(200, 210, 220, 0.4)';
             c.beginPath();
             c.arc(p.x, p.y, p.size, 0, Math.PI * 2);
             c.fill();
-            c.filter = 'none';
           } else if (isGust) {
-            // Gust = horizontal line (streak)
             const len = p.size * 6;
-            c.strokeStyle = `rgba(220, 225, 235, ${p.alpha * globalAlpha * 0.5})`;
+            c.strokeStyle = 'rgba(220, 225, 235, 0.5)';
             c.lineWidth = 1.5;
             c.beginPath();
             c.moveTo(p.x - len / 2, p.y);
             c.lineTo(p.x + len / 2, p.y);
             c.stroke();
           } else {
-            // Snowflakes
-            const isBlur = layerIdx === 5;
-            if (isBlur) {
-              c.filter = `blur(${p.size * 0.3}px)`;
-            }
-            c.fillStyle = `rgba(240, 245, 250, ${p.alpha * globalAlpha})`;
+            c.fillStyle = 'rgba(240, 245, 250, 0.9)';
             c.beginPath();
             c.arc(p.x, p.y, p.size, 0, Math.PI * 2);
             c.fill();
-            if (isBlur) c.filter = 'none';
           }
 
           c.restore();
@@ -282,7 +261,6 @@ const {
       animFrameId = requestAnimationFrame(render);
     }
 
-    // Expose controls
     (window as any).__rnm_storm = {
       setWind: (v: number) => { windMultiplier = v; },
       setVisibility: (v: number) => { visibility = Math.max(0, Math.min(1, v)); },
@@ -293,12 +271,12 @@ const {
     let resizeTimer: ReturnType<typeof setTimeout>;
     window.addEventListener('resize', () => {
       clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(init, 200);
+      resizeTimer = setTimeout(init, 150);
     });
 
     document.addEventListener('visibilitychange', () => {
       if (document.hidden) { isVisible = false; cancelAnimationFrame(animFrameId); }
-      else { isVisible = true; render(performance.now()); }
+      else { isVisible = true; lastTime = performance.now(); render(performance.now()); }
     });
 
     init();

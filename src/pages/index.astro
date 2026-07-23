@@ -1,18 +1,11 @@
 ---
 /**
- * Runas na Mesa — Entrada.
+ * Runas na Mesa — Entrada da Taverna.
  *
- * Não é uma landing page comercial.
- * Não é um portal.
- * Não tem botões, menus, links ou chamadas para ação.
- *
- * É uma experiência narrativa:
- *   TEMPESTADE → LUZ → PORTA → ABERTURA → TAVERNA → BLOG
- *
- * O usuário não "acessa um site".
- * Ele "encontra uma porta no meio da tempestade".
+ * Experiência narrativa cinematográfica em 15 estados:
+ *   Da Tempestade para a Taverna.
  */
-import WelcomeScene from '../components/WelcomeScene/WelcomeExperience.astro';
+import WelcomeExperience from '../components/WelcomeScene/WelcomeExperience.astro';
 ---
 
 <!DOCTYPE html>
@@ -20,11 +13,20 @@ import WelcomeScene from '../components/WelcomeScene/WelcomeExperience.astro';
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Runas na Mesa</title>
-    <meta name="robots" content="noindex, nofollow" />
+    <title>Runas na Mesa — Abertura da Taverna</title>
+    <meta name="description" content="Sua taverna digital para RPG de mesa. Encontre refúgio da tempestade." />
+    <meta name="theme-color" content="#060B17" />
+    
+    <!-- Preconnect Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+    <!-- Favicons -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" />
 
     <style>
-      /* Reset absoluto */
       *, *::before, *::after {
         margin: 0;
         padding: 0;
@@ -39,6 +41,6 @@ import WelcomeScene from '../components/WelcomeScene/WelcomeExperience.astro';
     </style>
   </head>
   <body>
-    <WelcomeScene />
+    <WelcomeExperience />
   </body>
 </html>
